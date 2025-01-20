@@ -1,8 +1,8 @@
 #ifndef DISCORD_CONTROLLER_H
 #define DISCORD_CONTROLLER_H
 
-#include "discord_game_sdk.h"
 #include "GamePage.h"
+#include "discord_game_sdk.h"
 
 class DiscordController;
 extern DiscordController *discordControllerInstance; // extern for settings page
@@ -51,7 +51,7 @@ typedef struct IDiscordApplication
 class DiscordController
 {
 
-public:
+  public:
     ~DiscordController();
     DiscordController();
     EDiscordResult connect();
@@ -71,7 +71,7 @@ public:
     char isConnected();
     void updateActivity(ActivityType activity_type, const char *details, const char *state);
     //--
-protected:
+  protected:
     DiscordApplication mApp;
     // connection is live and we have an instance
     char mIsHealthy;

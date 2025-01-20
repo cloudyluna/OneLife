@@ -3,26 +3,23 @@
 #include <stdint.h>
 #include <stdio.h>
 
+typedef struct
+{
+    unsigned int hashTableSize;
+    unsigned int keySize;
+    unsigned int valueSize;
+    FILE *file;
+    uint64_t lastHashBinLoc;
+    uint64_t lastValueLoc;
 
-typedef struct {
-        unsigned int hashTableSize;
-        unsigned int keySize;
-        unsigned int valueSize;
-        FILE *file;
-        uint64_t lastHashBinLoc;
-        uint64_t lastValueLoc;
-        
-        char lastWasQuickMiss;
-        
-        // each hash bin contains the most recently missed key for
-        // that bin and a 64-bit file location for the top of the stack
-        unsigned int hashBinSize;
-        uint8_t *hashBinBuffer;
-        int maxStackDepth;
-    } STACKDB;
+    char lastWasQuickMiss;
 
-    
-
+    // each hash bin contains the most recently missed key for
+    // that bin and a 64-bit file location for the top of the stack
+    unsigned int hashBinSize;
+    uint8_t *hashBinBuffer;
+    int maxStackDepth;
+} STACKDB;
 
 /**
  * Open database
@@ -42,20 +39,15 @@ typedef struct {
  * @param value_size Size of values in bytes
  * @return 0 on success, nonzero on error
  */
-int STACKDB_open(
-    STACKDB *inDB,
-    const char *inPath,
-    int inMode,
-    unsigned int inHashTableSize,
-    unsigned int inKeySize,
-    unsigned int inValueSize );
+int STACKDB_open(STACKDB *inDB, const char *inPath, int inMode, unsigned int inHashTableSize, unsigned int inKeySize,
+                 unsigned int inValueSize);
 
 /**
  * Close database
  *
  * @param db Database struct
  */
-void STACKDB_close( STACKDB *inDB );
+void STACKDB_close(STACKDB *inDB);
 
 /**
  * Get an entry
@@ -65,7 +57,7 @@ void STACKDB_close( STACKDB *inDB );
  * @param vbuf Value buffer (value_size bytes capacity)
  * @return -1 on I/O error, 0 on success, 1 on not found
  */
-int STACKDB_get( STACKDB *inDB, const void *inKey, void *outValue );
+int STACKDB_get(STACKDB *inDB, const void *inKey, void *outValue);
 
 /**
  * Put an entry (overwriting it if it already exists)
@@ -78,26 +70,24 @@ int STACKDB_get( STACKDB *inDB, const void *inKey, void *outValue );
  * @param value Value (value_size bytes)
  * @return -1 on I/O error, 0 on success
  */
-int STACKDB_put( STACKDB *inDB, const void *inKey, const void *inValue );
-
-
+int STACKDB_put(STACKDB *inDB, const void *inKey, const void *inValue);
 
 // version of put where caller guarantees that inKey does not exist
 // in database yet (nor has been gotten from DB as a miss previously)
 //
 // Insertion operation is much faster if we don't need to find an existing
 // record for inKey.
-int STACKDB_put_new( STACKDB *inDB, const void *inKey, const void *inValue );
-
+int STACKDB_put_new(STACKDB *inDB, const void *inKey, const void *inValue);
 
 /**
  * Cursor used for iterating over all entries in database
  */
-typedef struct {
-        STACKDB *db;
-        unsigned int hashBin;
-        uint64_t nextRecordLoc;
-        int stackDepth;
+typedef struct
+{
+    STACKDB *db;
+    unsigned int hashBin;
+    uint64_t nextRecordLoc;
+    int stackDepth;
 } STACKDB_Iterator;
 
 /**
@@ -106,7 +96,7 @@ typedef struct {
  * @param db Database struct
  * @param i Iterator to initialize
  */
-void STACKDB_Iterator_init( STACKDB *inDB, STACKDB_Iterator *inDBi );
+void STACKDB_Iterator_init(STACKDB *inDB, STACKDB_Iterator *inDBi);
 
 /**
  * Get the next entry
@@ -119,5 +109,4 @@ void STACKDB_Iterator_init( STACKDB *inDB, STACKDB_Iterator *inDBi );
  * @param vbuf Buffer to fill with next value (value_size bytes)
  * @return 0 if there are no more entries, negative on error, positive if an kbuf/vbuf have been filled
  */
-int STACKDB_Iterator_next( STACKDB_Iterator *inDBi, 
-                           void *outKey, void *outValue );
+int STACKDB_Iterator_next(STACKDB_Iterator *inDBi, void *outKey, void *outValue);

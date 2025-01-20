@@ -1,39 +1,32 @@
 #include "GamePage.h"
 
-
-
 #include "minorGems/ui/event/ActionListener.h"
-
 
 #include "TextButton.h"
 
+class GeneticHistoryPage : public GamePage, public ActionListener
+{
 
-class GeneticHistoryPage : public GamePage, public ActionListener {
+  public:
+    GeneticHistoryPage();
+    ~GeneticHistoryPage();
 
-    public:
-        GeneticHistoryPage();
-        ~GeneticHistoryPage();
-        
+    virtual void actionPerformed(GUIComponent *inTarget);
 
-        virtual void actionPerformed( GUIComponent *inTarget );
+    virtual void draw(doublePair inViewCenter, double inViewSize);
 
-        virtual void draw( doublePair inViewCenter, 
-                           double inViewSize );
+    virtual void makeActive(char inFresh);
 
-        virtual void makeActive( char inFresh );
+    virtual void specialKeyDown(int inKeyCode);
 
-        virtual void specialKeyDown( int inKeyCode );
+  protected:
+    TextButton mBackButton;
 
-    protected:
-        TextButton mBackButton;
+    TextButton mRefreshButton;
 
-        TextButton mRefreshButton;
+    TextButton mLeaderboardButton;
 
-        TextButton mLeaderboardButton;
+    double mRefreshTime;
 
-        double mRefreshTime;
-        
-
-        int mSkip;
-        
-    };
+    int mSkip;
+};

@@ -1,47 +1,39 @@
 #ifndef SPRITE_TOGGLE_BUTTON_INCLUDED
 #define SPRITE_TOGGLE_BUTTON_INCLUDED
 
-
 #include "SpriteButton.h"
 
-
 // button that toggles between two sprites (and states) when clicked
-class SpriteToggleButton : public SpriteButton {
-        
-    public:
+class SpriteToggleButton : public SpriteButton
+{
 
-        SpriteToggleButton( const char *inTGAFileName,
-                            const char *inTGAFileNameB,
-                            double inX, double inY,
-                            double inDrawScale = 1.0 );
+  public:
+    SpriteToggleButton(const char *inTGAFileName, const char *inTGAFileNameB, double inX, double inY,
+                       double inDrawScale = 1.0);
 
-        virtual ~SpriteToggleButton();
+    virtual ~SpriteToggleButton();
 
+    char getToggled()
+    {
+        return mToggled;
+    }
 
-        char getToggled() {
-            return mToggled;
-            }
+    // does not fire an event
+    void setToggled(char inToggled);
 
-        // does not fire an event
-        void setToggled( char inToggled );
-        
-        
-        // set separate tip message for B state
-        virtual void setMouseOverTipB( const char *inTipMessageB );
+    // set separate tip message for B state
+    virtual void setMouseOverTipB(const char *inTipMessageB);
 
-        // overrides from Button to toggle state
-        virtual void pointerUp( float inX, float inY ); 
+    // overrides from Button to toggle state
+    virtual void pointerUp(float inX, float inY);
 
-    protected:
-        
+  protected:
+    SpriteHandle mSpriteB;
 
-        SpriteHandle mSpriteB;
-        
-        char mToggled;
-        char mShouldDestroySpriteB;
+    char mToggled;
+    char mShouldDestroySpriteB;
 
-        char *mMouseOverTipB;
-    };
-
+    char *mMouseOverTipB;
+};
 
 #endif

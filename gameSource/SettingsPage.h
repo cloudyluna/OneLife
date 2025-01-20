@@ -1,136 +1,125 @@
 #include "GamePage.h"
 
-#include "TextButton.h"
-#include "CheckboxButton.h"
-#include "RadioButtonSet.h"
-#include "ValueSlider.h"
-#include "SoundUsage.h"
-#include "DropdownList.h"
 #include "Background.h"
-
+#include "CheckboxButton.h"
+#include "DropdownList.h"
+#include "RadioButtonSet.h"
+#include "SoundUsage.h"
+#include "TextButton.h"
+#include "ValueSlider.h"
 
 #include "minorGems/ui/event/ActionListener.h"
 
+class SettingsPage : public GamePage, public ActionListener
+{
 
+  public:
+    SettingsPage();
+    ~SettingsPage();
 
+    virtual void draw(doublePair inViewCenter, double inViewSize);
 
-class SettingsPage : public GamePage, public ActionListener {
-        
-    public:
-        
-        SettingsPage();
-        ~SettingsPage();
-        
+    virtual void step();
 
-        virtual void draw( doublePair inViewCenter, 
-                           double inViewSize );
+    void pressBackButton();
 
-        virtual void step();
+    virtual void actionPerformed(GUIComponent *inTarget);
 
-        void pressBackButton();
+    virtual void makeActive(char inFresh);
+    virtual void makeNotActive();
+    virtual void updatePage();
+    virtual void checkRestartRequired();
 
-        virtual void actionPerformed( GUIComponent *inTarget );
-
-        
-        virtual void makeActive( char inFresh );
-        virtual void makeNotActive();
-        virtual void updatePage();
-        virtual void checkRestartRequired();
-
-    protected:
-        
-        int mOldFullscreenSetting;
-        int mOldBorderlessSetting;
-        int mOldGenerateTownPlannerMapsSetting;
-        int mTrippingEffectDisabledSetting;
-        int mEnableNudeSetting;
-        int mEnableFOVSetting;
-        int mEnableKActionsSetting;
-        int mEnableCenterCameraSetting;
+  protected:
+    int mOldFullscreenSetting;
+    int mOldBorderlessSetting;
+    int mOldGenerateTownPlannerMapsSetting;
+    int mTrippingEffectDisabledSetting;
+    int mEnableNudeSetting;
+    int mEnableFOVSetting;
+    int mEnableKActionsSetting;
+    int mEnableCenterCameraSetting;
 #ifdef USE_DISCORD
-        int mDiscordRichPresenceSetting;
-        int mDiscordRichPresenceStatusSetting;
-        int mDiscordShowAgeInStatusSetting;
-        int mDiscordRichPresenceDetailsSetting;
-        int mDiscordHideFirstNameInDetailsSetting;
+    int mDiscordRichPresenceSetting;
+    int mDiscordRichPresenceStatusSetting;
+    int mDiscordShowAgeInStatusSetting;
+    int mDiscordRichPresenceDetailsSetting;
+    int mDiscordHideFirstNameInDetailsSetting;
 #endif // USE_DISCORD
-        int mPage;
-        
-        SoundUsage mTestSound;
+    int mPage;
 
-        double mMusicStartTime;
+    SoundUsage mTestSound;
 
+    double mMusicStartTime;
 
-        Background mBackground;
+    Background mBackground;
 
-        // Left Pane
-        TextButton mRestartButton;
-        
-        TextButton mGameplayButton;
-        TextButton mControlButton;
-        TextButton mScreenButton;
-        TextButton mSoundButton;
+    // Left Pane
+    TextButton mRestartButton;
+
+    TextButton mGameplayButton;
+    TextButton mControlButton;
+    TextButton mScreenButton;
+    TextButton mSoundButton;
 #ifdef USE_DISCORD
-        TextButton mDiscordButton;
+    TextButton mDiscordButton;
 #endif // USE_DISCORD
-        TextButton mAdvancedButton;
+    TextButton mAdvancedButton;
 
-        TextButton mBackButton;
-        
-        TextButton mEditAccountButton;
+    TextButton mBackButton;
 
-        // Gameplay
-        CheckboxButton mEnableFOVBox;
-        CheckboxButton mEnableCenterCameraBox;
-        CheckboxButton mEnableNudeBox;
-        ValueSlider mUISizeSlider;
-        
-        CheckboxButton mUseCustomServerBox;
-        TextField mCustomServerAddressField;
-        TextField mCustomServerPortField;
-        TextButton mCopyButton;
-        TextButton mPasteButton;
-        
-        // Control
-        CheckboxButton mEnableKActionsBox;
-        RadioButtonSet *mCursorModeSet;
-        ValueSlider mCursorScaleSlider;
+    TextButton mEditAccountButton;
 
-        // Screen
-        TextButton mRedetectButton;
-        CheckboxButton mVsyncBox;
-        CheckboxButton mFullscreenBox;
-        CheckboxButton mBorderlessBox;
-        TextField mTargetFrameRateField;
-        CheckboxButton mTrippingEffectDisabledBox;
-        
-        // Sound
-        ValueSlider mMusicLoudnessSlider;
-        ValueSlider mSoundEffectsLoudnessSlider;
+    // Gameplay
+    CheckboxButton mEnableFOVBox;
+    CheckboxButton mEnableCenterCameraBox;
+    CheckboxButton mEnableNudeBox;
+    ValueSlider mUISizeSlider;
+
+    CheckboxButton mUseCustomServerBox;
+    TextField mCustomServerAddressField;
+    TextField mCustomServerPortField;
+    TextButton mCopyButton;
+    TextButton mPasteButton;
+
+    // Control
+    CheckboxButton mEnableKActionsBox;
+    RadioButtonSet *mCursorModeSet;
+    ValueSlider mCursorScaleSlider;
+
+    // Screen
+    TextButton mRedetectButton;
+    CheckboxButton mVsyncBox;
+    CheckboxButton mFullscreenBox;
+    CheckboxButton mBorderlessBox;
+    TextField mTargetFrameRateField;
+    CheckboxButton mTrippingEffectDisabledBox;
+
+    // Sound
+    ValueSlider mMusicLoudnessSlider;
+    ValueSlider mSoundEffectsLoudnessSlider;
 
 #ifdef USE_DISCORD
-        // Discord
-        CheckboxButton mEnableDiscordRichPresence;
-        CheckboxButton mEnableDiscordRichPresenceStatus;
-        CheckboxButton mEnableDiscordShowAgeInStatus;
-        CheckboxButton mEnableDiscordRichPresenceDetails;
-        CheckboxButton mDiscordHideFirstNameInDetails;
+    // Discord
+    CheckboxButton mEnableDiscordRichPresence;
+    CheckboxButton mEnableDiscordRichPresenceStatus;
+    CheckboxButton mEnableDiscordShowAgeInStatus;
+    CheckboxButton mEnableDiscordRichPresenceDetails;
+    CheckboxButton mDiscordHideFirstNameInDetails;
 #endif // USE_DISCORD
 
-        // Advanced
-        DropdownList mCommandShortcuts;
-        CheckboxButton mEnableAdvancedShowUseOnObjectHoverKeybind;
-        CheckboxButton mEnableCoordinatesBox;
-        CheckboxButton mEnablePersistentEmoteBox;
-        CheckboxButton mEnableYumFinderBox;
-        CheckboxButton mEnableObjectSearchBox;
-        CheckboxButton mEnableFamilyDisplayBox;
-        CheckboxButton mEnableDangerousTileBox;
-        CheckboxButton mGenerateTownPlannerMapsBox;
-        CheckboxButton mEnableShowingHeldFoodPips;
-        CheckboxButton mEnableAlwaysShowPlayerLabelsBox;
-        
-        
-        void checkRestartButtonVisibility();
-        
-    };
+    // Advanced
+    DropdownList mCommandShortcuts;
+    CheckboxButton mEnableAdvancedShowUseOnObjectHoverKeybind;
+    CheckboxButton mEnableCoordinatesBox;
+    CheckboxButton mEnablePersistentEmoteBox;
+    CheckboxButton mEnableYumFinderBox;
+    CheckboxButton mEnableObjectSearchBox;
+    CheckboxButton mEnableFamilyDisplayBox;
+    CheckboxButton mEnableDangerousTileBox;
+    CheckboxButton mGenerateTownPlannerMapsBox;
+    CheckboxButton mEnableShowingHeldFoodPips;
+    CheckboxButton mEnableAlwaysShowPlayerLabelsBox;
+
+    void checkRestartButtonVisibility();
+};

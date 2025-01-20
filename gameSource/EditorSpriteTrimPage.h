@@ -1,9 +1,7 @@
 #ifndef EDITOR_SPRITE_TRIM_PAGE_INCLUDED
 #define EDITOR_SPRITE_TRIM_PAGE_INCLUDED
 
-
 #include "minorGems/ui/event/ActionListener.h"
-
 
 #include "GamePage.h"
 
@@ -12,102 +10,85 @@
 
 #include "ValueSlider.h"
 
+typedef struct PickedRect
+{
+    int xStart;
+    int yStart;
+    int xEnd;
+    int yEnd;
 
+    // true if there's an intersection on this side
+    // order:  up, right, down, left
+    char intersectSides[4];
 
-typedef struct PickedRect {
-        int xStart;
-        int yStart;
-        int xEnd; 
-        int yEnd;
+    // true if this side is covered by another tile
+    // we need to reduce the alpha values of semi-transparent areas
+    char coveredSides[4];
 
-        
-        // true if there's an intersection on this side
-        // order:  up, right, down, left
-        char intersectSides[4];
-        
-        // true if this side is covered by another tile
-        // we need to reduce the alpha values of semi-transparent areas
-        char coveredSides[4];
+} PickedRect;
 
-    } PickedRect;
+class EditorSpriteTrimPage : public GamePage, public ActionListener
+{
 
-    
+  public:
+    EditorSpriteTrimPage();
+    ~EditorSpriteTrimPage();
 
-class EditorSpriteTrimPage : public GamePage, public ActionListener {
-        
-    public:
-        EditorSpriteTrimPage();
-        ~EditorSpriteTrimPage();
-    
-        virtual void actionPerformed( GUIComponent *inTarget );
+    virtual void actionPerformed(GUIComponent *inTarget);
 
+    virtual void drawUnderComponents(doublePair inViewCenter, double inViewSize);
 
-        virtual void drawUnderComponents( doublePair inViewCenter, 
-                                          double inViewSize );
-        
-        virtual void makeActive( char inFresh );
-        
-        
-        virtual void pointerMove( float inX, float inY );
-        virtual void pointerDown( float inX, float inY );
-        virtual void pointerDrag( float inX, float inY );
-        virtual void pointerUp( float inX, float inY );
+    virtual void makeActive(char inFresh);
 
-        virtual void keyDown( unsigned char inASCII );
-        
-        virtual void specialKeyDown( int inKeyCode );
-        
+    virtual void pointerMove(float inX, float inY);
+    virtual void pointerDown(float inX, float inY);
+    virtual void pointerDrag(float inX, float inY);
+    virtual void pointerUp(float inX, float inY);
 
-    protected:
-        
-        char isPointInSprite( int inX, int inY );
-        
-        // trims rect so that it doesn't intersect with mRects
-        // returns true if inRect is totally eliminated by this process
-        // 
-        // inUpdateCovered true to update covered flags of existing
-        char trimRectByExisting( PickedRect *inRect,
-                                 char inUpdateCovered );
+    virtual void keyDown(unsigned char inASCII);
 
+    virtual void specialKeyDown(int inKeyCode);
 
-        SimpleVector<PickedRect> mRects;
+  protected:
+    char isPointInSprite(int inX, int inY);
 
-        TextButton mImportEditorButton;
-        
-        TextButton mSaveButton;
+    // trims rect so that it doesn't intersect with mRects
+    // returns true if inRect is totally eliminated by this process
+    //
+    // inUpdateCovered true to update covered flags of existing
+    char trimRectByExisting(PickedRect *inRect, char inUpdateCovered);
 
-        TextButton mClearRectButton;
+    SimpleVector<PickedRect> mRects;
 
-        TextButton mFreehandSplitButton;
+    TextButton mImportEditorButton;
 
-        ValueSlider mBrushSizeSlider;
-        
-        char mFreehandSplitMode;
+    TextButton mSaveButton;
 
+    TextButton mClearRectButton;
 
-        Picker mSpritePicker;
-        
-        int mPickedSprite;
-        
+    TextButton mFreehandSplitButton;
 
-        char mPickingRect;
-        
-        int mPickStartX, mPickStartY;
-        int mPickEndX, mPickEndY;
+    ValueSlider mBrushSizeSlider;
 
-        Image *mFreehandSelection;
-        SpriteHandle mFreehandSelectionSprite;
-        
-        int mCursorOffsetX, mCursorOffsetY;
-        
-        
-        void resetSelection();
+    char mFreehandSplitMode;
 
-        void addPointToSelection( int inX, int inY, double inVal );
-        
-    };
+    Picker mSpritePicker;
 
-        
+    int mPickedSprite;
 
+    char mPickingRect;
+
+    int mPickStartX, mPickStartY;
+    int mPickEndX, mPickEndY;
+
+    Image *mFreehandSelection;
+    SpriteHandle mFreehandSelectionSprite;
+
+    int mCursorOffsetX, mCursorOffsetY;
+
+    void resetSelection();
+
+    void addPointToSelection(int inX, int inY, double inVal);
+};
 
 #endif

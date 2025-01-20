@@ -1,209 +1,178 @@
 #ifndef EDITOR_IMPORT_PAGE_INCLUDED
 #define EDITOR_IMPORT_PAGE_INCLUDED
 
-
-
-
 #include "minorGems/ui/event/ActionListener.h"
 #include "minorGems/util/SimpleVector.h"
 
 #include "minorGems/game/game.h"
 
-
+#include "CheckboxButton.h"
 #include "GamePage.h"
 #include "TextButton.h"
-#include "CheckboxButton.h"
 #include "TextField.h"
 
 #include "Picker.h"
 
 #include "ValueSlider.h"
 
-
 #include "overlayBank.h"
 
 #include "keyLegend.h"
 
+class EditorImportPage : public GamePage, public ActionListener
+{
 
+  public:
+    EditorImportPage();
+    ~EditorImportPage();
 
-class EditorImportPage : public GamePage, public ActionListener {
-        
-    public:
-        EditorImportPage();
-        ~EditorImportPage();
+    void clearUseOfOverlay(int inOverlayID);
 
-        void clearUseOfOverlay( int inOverlayID );
+    virtual void actionPerformed(GUIComponent *inTarget);
 
-        
-        virtual void actionPerformed( GUIComponent *inTarget );
-        
-        virtual void drawUnderComponents( doublePair inViewCenter, 
-                                          double inViewSize );
-        virtual void draw( doublePair inViewCenter, 
-                           double inViewSize );
-        
-        virtual void step();
-  
-        virtual void makeActive( char inFresh );
-        
+    virtual void drawUnderComponents(doublePair inViewCenter, double inViewSize);
+    virtual void draw(doublePair inViewCenter, double inViewSize);
 
-        virtual void pointerMove( float inX, float inY );
-        virtual void pointerDown( float inX, float inY );
-        virtual void pointerDrag( float inX, float inY );
-        virtual void pointerUp( float inX, float inY );
+    virtual void step();
 
-        virtual void keyDown( unsigned char inASCII );
-        virtual void keyUp( unsigned char inASCII );
-        virtual void specialKeyDown( int inKeyCode );
+    virtual void makeActive(char inFresh);
 
-    protected:
-        
+    virtual void pointerMove(float inX, float inY);
+    virtual void pointerDown(float inX, float inY);
+    virtual void pointerDrag(float inX, float inY);
+    virtual void pointerUp(float inX, float inY);
 
-        void processSelection();
-        
+    virtual void keyDown(unsigned char inASCII);
+    virtual void keyUp(unsigned char inASCII);
+    virtual void specialKeyDown(int inKeyCode);
 
-        void clearLines();
-        
+  protected:
+    void processSelection();
 
-        TextButton mImportButton;
-        TextButton mImportLinesButton;
-        
-        TextButton mNextSpriteImportButton;
-        TextButton mPrevSpriteImportButton;
+    void clearLines();
 
-        TextButton mNextLinesImportButton;
-        TextButton mPrevLinesImportButton;
-        
-        int mCurrentSpriteImportCacheIndex;
-        int mCurrentLinesImportCacheIndex;
-        
-        char *mImportPathOverride;
+    TextButton mImportButton;
+    TextButton mImportLinesButton;
 
-        
-        TextButton mXTopLinesButton;
-        TextButton mImportOverlayButton;
+    TextButton mNextSpriteImportButton;
+    TextButton mPrevSpriteImportButton;
 
+    TextButton mNextLinesImportButton;
+    TextButton mPrevLinesImportButton;
 
+    int mCurrentSpriteImportCacheIndex;
+    int mCurrentLinesImportCacheIndex;
 
+    char *mImportPathOverride;
 
-        int mSheetW, mSheetH;
+    TextButton mXTopLinesButton;
+    TextButton mImportOverlayButton;
 
-        char mSelect;
-        doublePair mSelectStart;
-        doublePair mSelectEnd;
-        
-        Image *mImportedSheet;
-        SpriteHandle mImportedSheetSprite;
-        
-        // starts transparent
-        // we add white to it with mouse
-        Image *mWhiteOutSheet;
-        SpriteHandle mWhiteOutSheetSprite;
+    int mSheetW, mSheetH;
 
+    char mSelect;
+    doublePair mSelectStart;
+    doublePair mSelectEnd;
 
-        Image *mProcessedSelection;
-        SpriteHandle mProcessedSelectionSprite;
+    Image *mImportedSheet;
+    SpriteHandle mImportedSheetSprite;
 
-        Image *mProcessedShadow;
-        SpriteHandle mProcessedShadowSprite;
-        
-        doublePair mProcessedCenterOffset;
+    // starts transparent
+    // we add white to it with mouse
+    Image *mWhiteOutSheet;
+    SpriteHandle mWhiteOutSheetSprite;
 
-        char mSelectionMultiplicative;
+    Image *mProcessedSelection;
+    SpriteHandle mProcessedSelectionSprite;
 
+    Image *mProcessedShadow;
+    SpriteHandle mProcessedShadowSprite;
 
-        ValueSlider mShadowSlider;
-        CheckboxButton mSolidCheckbox;
-        
-        ValueSlider mBlackLineThresholdSlider;
-        TextButton mBlackLineThresholdDefaultButton;
+    doublePair mProcessedCenterOffset;
 
-        ValueSlider mPaperThresholdSlider;
-        TextButton mPaperThresholdDefaultButton;
+    char mSelectionMultiplicative;
 
-        ValueSlider mSaturationSlider;
-        TextButton mSaturationDefaultButton;
+    ValueSlider mShadowSlider;
+    CheckboxButton mSolidCheckbox;
 
+    ValueSlider mBlackLineThresholdSlider;
+    TextButton mBlackLineThresholdDefaultButton;
 
-        TextField mSpriteTagField;
-        
-        TextButton mSaveSpriteButton;
-        TextButton mSaveOverlayButton;
-        
-        TextButton mInvertButton;
-        char mInvertColors;
-        
+    ValueSlider mPaperThresholdSlider;
+    TextButton mPaperThresholdDefaultButton;
 
-        Picker mSpritePicker;
-        Picker mOverlayPicker;
-        
+    ValueSlider mSaturationSlider;
+    TextButton mSaturationDefaultButton;
 
-        TextButton mSpriteTrimEditorButton;
-        TextButton mObjectEditorButton;
+    TextField mSpriteTagField;
 
-        SpriteHandle mCenterMarkSprite;
-        SpriteHandle mInternalPaperMarkSprite;
-        
-        char mCenterSet;
-        doublePair mCenterPoint;
-        
-        SimpleVector<doublePair> mInternalPaperPoints;
-        
+    TextButton mSaveSpriteButton;
+    TextButton mSaveOverlayButton;
 
-        SimpleVector<doublePair> mOverlayOffset;
-        SimpleVector<OverlayRecord *>mCurrentOverlay;
-        
+    TextButton mInvertButton;
+    char mInvertColors;
 
-        SimpleVector<doublePair> mLinesOffset;
-        SimpleVector<Image*> mLinesImages;
-        SimpleVector<SpriteHandle> mLinesSprites;
-        
+    Picker mSpritePicker;
+    Picker mOverlayPicker;
 
-        char mMovingSheet;
-        doublePair mSheetOffset;
-        doublePair mMovingSheetPointerStart;
-        
+    TextButton mSpriteTrimEditorButton;
+    TextButton mObjectEditorButton;
 
-        char mSettingSpriteCenter;
-        
-        char mWhitingOut;
-        
-        char mAnyWhiteOutSet;
-        
-        char mPlacingInternalPaper;
-        
+    SpriteHandle mCenterMarkSprite;
+    SpriteHandle mInternalPaperMarkSprite;
 
-        char mMovingOverlay;
-        char mScalingOverlay;
-        char mRotatingOverlay;
-        SimpleVector<double> mOverlayScale;
-        SimpleVector<double> mOverlayRotation;
-        
-        SimpleVector<char> mOverlayFlip;
-        
+    char mCenterSet;
+    doublePair mCenterPoint;
 
-        doublePair mMovingOverlayPointerStart;
+    SimpleVector<doublePair> mInternalPaperPoints;
 
-        double mMovingOverlayScaleStart;
-        double mMovingOverlayRotationStart;
+    SimpleVector<doublePair> mOverlayOffset;
+    SimpleVector<OverlayRecord *> mCurrentOverlay;
 
-        TextButton mClearRotButton;
-        TextButton mClearScaleButton;
+    SimpleVector<doublePair> mLinesOffset;
+    SimpleVector<Image *> mLinesImages;
+    SimpleVector<SpriteHandle> mLinesSprites;
 
-        TextButton mFlipOverlayButton;
+    char mMovingSheet;
+    doublePair mSheetOffset;
+    doublePair mMovingSheetPointerStart;
 
-        TextButton mClearOverlayButton;
-        
-        KeyLegend mSheetKeyLegend;
-        KeyLegend mSheetKeyLegendB;
-        KeyLegend mLinesKeyLegend;
-        KeyLegend mOverlayKeyLegend;
-        
-        char mShowTagMessage;
+    char mSettingSpriteCenter;
 
-        char mAKeyDown;
-    };
+    char mWhitingOut;
 
+    char mAnyWhiteOutSet;
 
+    char mPlacingInternalPaper;
+
+    char mMovingOverlay;
+    char mScalingOverlay;
+    char mRotatingOverlay;
+    SimpleVector<double> mOverlayScale;
+    SimpleVector<double> mOverlayRotation;
+
+    SimpleVector<char> mOverlayFlip;
+
+    doublePair mMovingOverlayPointerStart;
+
+    double mMovingOverlayScaleStart;
+    double mMovingOverlayRotationStart;
+
+    TextButton mClearRotButton;
+    TextButton mClearScaleButton;
+
+    TextButton mFlipOverlayButton;
+
+    TextButton mClearOverlayButton;
+
+    KeyLegend mSheetKeyLegend;
+    KeyLegend mSheetKeyLegendB;
+    KeyLegend mLinesKeyLegend;
+    KeyLegend mOverlayKeyLegend;
+
+    char mShowTagMessage;
+
+    char mAKeyDown;
+};
 
 #endif

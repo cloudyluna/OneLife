@@ -5,253 +5,227 @@
 #include "minorGems/game/drawUtils.h"
 #include "minorGems/game/game.h"
 
+ValueSlider::ValueSlider(Font *inDisplayFont, double inX, double inY, double inBorder, double inWidth, double inHeight,
+                         double inLowValue, double inHighValue, const char *inLabelText, char inDrawLabelWithShadow)
+    : PageComponent(inX, inY), mFillColor(0.8, 0.8, 0, 1), mBackFillColor(0, 0, 0, 1), mFont(inDisplayFont),
+      mValueField(inDisplayFont, 0, 0, 5, false, inLabelText, ".0123456789-", NULL, inDrawLabelWithShadow),
+      mLowValue(inLowValue), mHighValue(inHighValue), mValue(inLowValue), mBarBorder(inBorder), mPointerDown(false),
+      mForceDecimalDigits(false), mDecimalDigits(0)
+{
 
+    addComponent(&mValueField);
+    mValueField.addActionListener(this);
 
-ValueSlider::ValueSlider( Font *inDisplayFont, 
-                          double inX, double inY,
-                          double inBorder,
-                          double inWidth, double inHeight,
-                          double inLowValue,
-                          double inHighValue,
-                          const char *inLabelText,
-                          char inDrawLabelWithShadow )
-        : PageComponent( inX, inY ),
-          mFillColor( 0.8, 0.8, 0, 1 ),
-          mBackFillColor( 0, 0, 0, 1 ),
-          mFont( inDisplayFont ),
-          mValueField( inDisplayFont, 0, 0, 5,
-                       false,
-                       inLabelText,
-                       ".0123456789-", NULL, inDrawLabelWithShadow ),
-          mLowValue( inLowValue ),
-          mHighValue( inHighValue ),
-          mValue( inLowValue ),
-          mBarBorder( inBorder ),
-          mPointerDown( false ),
-          mForceDecimalDigits( false ),
-          mDecimalDigits( 0 ) {
-
-    addComponent( &mValueField );
-    mValueField.addActionListener( this );
-
-    mValueField.setFireOnLoseFocus( true );
+    mValueField.setFireOnLoseFocus(true);
 
     mBarStartX = mValueField.getRightEdgeX() + 20;
-    
+
     mBarEndX = mBarStartX + inWidth;
 
-    mBarStartY = - inHeight/2;
+    mBarStartY = -inHeight / 2;
     mBarEndY = mBarStartY + inHeight;
-    }
+}
 
+ValueSlider::~ValueSlider()
+{
+}
 
-
-ValueSlider::~ValueSlider() {
-    }
-
-
-
-void ValueSlider::setHighValue( double inHighValue ) {
+void ValueSlider::setHighValue(double inHighValue)
+{
     mHighValue = inHighValue;
-    if( mValue > mHighValue ) {
+    if (mValue > mHighValue)
+    {
         mValue = mHighValue;
-        }
-    setFieldFromValue();
     }
+    setFieldFromValue();
+}
 
-
-
-double ValueSlider::getHighValue() {
+double ValueSlider::getHighValue()
+{
     return mHighValue;
-    }
+}
 
-
-
-double ValueSlider::getValue() {
+double ValueSlider::getValue()
+{
     return mValue;
-    }
+}
 
-
-void ValueSlider::setValue( double inValue ) {
+void ValueSlider::setValue(double inValue)
+{
     mValue = inValue;
-    if( mValue < mLowValue ) {
+    if (mValue < mLowValue)
+    {
         mValue = mLowValue;
-        }
-    if( mValue > mHighValue ) {
-        mValue = mHighValue;
-        }
-    setFieldFromValue();
     }
+    if (mValue > mHighValue)
+    {
+        mValue = mHighValue;
+    }
+    setFieldFromValue();
+}
 
-
-
-char ValueSlider::isPointerDown() {
+char ValueSlider::isPointerDown()
+{
     return mPointerDown;
-    }
+}
 
-
-
-void ValueSlider::setFieldFromValue() {
+void ValueSlider::setFieldFromValue()
+{
     int numD = 3;
-    
-    if( mLowValue <= -100 || mHighValue >= 100 ) {
+
+    if (mLowValue <= -100 || mHighValue >= 100)
+    {
         numD = 1;
-        }
-    else if( mLowValue <= -10 || mHighValue >= 10 ) {
+    }
+    else if (mLowValue <= -10 || mHighValue >= 10)
+    {
         numD = 2;
-        }
-    
-    if( mForceDecimalDigits ) {
+    }
+
+    if (mForceDecimalDigits)
+    {
         numD = mDecimalDigits;
-        }
-
-    mValueField.setFloat( mValue, numD );
     }
 
+    mValueField.setFloat(mValue, numD);
+}
 
-
-void ValueSlider::setFillColor( Color inColor ) {
+void ValueSlider::setFillColor(Color inColor)
+{
     mFillColor = inColor;
-    }
+}
 
-
-
-void ValueSlider::setBackFillColor( Color inColor ) {
+void ValueSlider::setBackFillColor(Color inColor)
+{
     mBackFillColor = inColor;
-    }
+}
 
+void ValueSlider::toggleField(char inFieldVisible)
+{
+    mValueField.setVisible(inFieldVisible);
+}
 
-void ValueSlider::toggleField( char inFieldVisible ) {
-    mValueField.setVisible( inFieldVisible );
-    }
+void ValueSlider::actionPerformed(GUIComponent *inTarget)
+{
+    if (inTarget == &mValueField)
+    {
+        double value = (double)(mValueField.getFloat());
 
-
-
-
-
-void ValueSlider::actionPerformed( GUIComponent *inTarget ) {
-    if( inTarget == &mValueField ) {
-        double value = (double)( mValueField.getFloat() );
-        
         double setValue = value;
-        
-        if( value < mLowValue ) {
+
+        if (value < mLowValue)
+        {
             value = mLowValue;
-            }
-        if( value > mHighValue ) {
+        }
+        if (value > mHighValue)
+        {
             value = mHighValue;
-            }
-        
+        }
+
         mValue = value;
-        
-        if( value != setValue ) {
+
+        if (value != setValue)
+        {
             setFieldFromValue();
-            }
-        
-        fireActionPerformed( this );
         }
-    
+
+        fireActionPerformed(this);
     }
+}
 
+void ValueSlider::draw()
+{
 
+    setDrawColor(1, 1, 1, 1);
 
-void ValueSlider::draw() {
-    
-    setDrawColor( 1, 1, 1, 1 );
-    
-    drawRect( mBarStartX, mBarStartY, 
-              mBarEndX, mBarEndY );
+    drawRect(mBarStartX, mBarStartY, mBarEndX, mBarEndY);
 
-    setDrawColor( mBackFillColor.r, mBackFillColor.g, mBackFillColor.b, 1 );
-    
-    drawRect( mBarStartX + mBarBorder, mBarStartY + mBarBorder, 
-              mBarEndX - mBarBorder, mBarEndY - mBarBorder );
+    setDrawColor(mBackFillColor.r, mBackFillColor.g, mBackFillColor.b, 1);
 
-    
-    double fillWidth = ( ( mValue - mLowValue ) / ( mHighValue - mLowValue ) )
-        * ( mBarEndX - mBarStartX - 2 * mBarBorder );
-    
-    setDrawColor( mFillColor.r, mFillColor.g, mFillColor.b, mFillColor.a );
-    
-    drawRect( mBarStartX + mBarBorder, mBarStartY + mBarBorder, 
-              mBarStartX + mBarBorder + fillWidth, mBarEndY - mBarBorder );
-    
-    }
+    drawRect(mBarStartX + mBarBorder, mBarStartY + mBarBorder, mBarEndX - mBarBorder, mBarEndY - mBarBorder);
 
+    double fillWidth = ((mValue - mLowValue) / (mHighValue - mLowValue)) * (mBarEndX - mBarStartX - 2 * mBarBorder);
 
+    setDrawColor(mFillColor.r, mFillColor.g, mFillColor.b, mFillColor.a);
 
-char ValueSlider::isInBar( float inX, float inY ) {
+    drawRect(mBarStartX + mBarBorder, mBarStartY + mBarBorder, mBarStartX + mBarBorder + fillWidth,
+             mBarEndY - mBarBorder);
+}
+
+char ValueSlider::isInBar(float inX, float inY)
+{
     // let mouse move off ends in x direction a bit extra
-    if( inX > mBarStartX - 2 * mBarBorder && inX < mBarEndX + 2 * mBarBorder &&
-        inY > mBarStartY && inY < mBarEndY ) {
+    if (inX > mBarStartX - 2 * mBarBorder && inX < mBarEndX + 2 * mBarBorder && inY > mBarStartY && inY < mBarEndY)
+    {
         return true;
-        }
-    return false;        
     }
+    return false;
+}
 
+void ValueSlider::pointerDown(float inX, float inY)
+{
 
-
-void ValueSlider::pointerDown( float inX, float inY ) {
-    
     int mouseButton = getLastMouseButton();
-    if ( mouseButton == MouseButton::WHEELUP || mouseButton == MouseButton::WHEELDOWN ) { return; }
-    
-    if( isInBar( inX, inY ) ) {
-        mPointerDown = true;
-        }
-    
-    pointerDrag( inX, inY );
+    if (mouseButton == MouseButton::WHEELUP || mouseButton == MouseButton::WHEELDOWN)
+    {
+        return;
     }
 
+    if (isInBar(inX, inY))
+    {
+        mPointerDown = true;
+    }
 
+    pointerDrag(inX, inY);
+}
 
-void ValueSlider::pointerDrag( float inX, float inY ) {
-    if( ! mPointerDown ) {
+void ValueSlider::pointerDrag(float inX, float inY)
+{
+    if (!mPointerDown)
+    {
         return;
-        }
-    
-    
-    mValue = mLowValue + 
-        (mHighValue - mLowValue ) * 
-        ( inX - mBarStartX - mBarBorder ) / 
-        ( mBarEndX - mBarStartX - 2 * mBarBorder );
-    
-    if( mValue < mLowValue ) {
+    }
+
+    mValue = mLowValue +
+             (mHighValue - mLowValue) * (inX - mBarStartX - mBarBorder) / (mBarEndX - mBarStartX - 2 * mBarBorder);
+
+    if (mValue < mLowValue)
+    {
         mValue = mLowValue;
-        }
-    if( mValue > mHighValue ) {
+    }
+    if (mValue > mHighValue)
+    {
         mValue = mHighValue;
-        }
-    
+    }
 
     setFieldFromValue();
-    fireActionPerformed( this );
+    fireActionPerformed(this);
+}
+
+void ValueSlider::pointerUp(float inX, float inY)
+{
+
+    int mouseButton = getLastMouseButton();
+    if (mouseButton == MouseButton::WHEELUP || mouseButton == MouseButton::WHEELDOWN)
+    {
+        return;
     }
 
-
-
-
-void ValueSlider::pointerUp( float inX, float inY ) {
-    
-    int mouseButton = getLastMouseButton();
-    if ( mouseButton == MouseButton::WHEELUP || mouseButton == MouseButton::WHEELDOWN ) { return; }
-    
     char wasDown = mPointerDown;
-    
-    pointerDrag( inX, inY );
-    
+
+    pointerDrag(inX, inY);
+
     mPointerDown = false;
 
-    if( wasDown ) {
+    if (wasDown)
+    {
         // always fire action on release, even if release is off bar
-        fireActionPerformed( this );
-        }
+        fireActionPerformed(this);
     }
+}
 
-
- 
-void ValueSlider::forceDecimalDigits( int inNumDigitsAfterDecimal ) {
+void ValueSlider::forceDecimalDigits(int inNumDigitsAfterDecimal)
+{
     mForceDecimalDigits = true;
     mDecimalDigits = inNumDigitsAfterDecimal;
-    }
-
+}

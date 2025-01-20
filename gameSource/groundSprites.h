@@ -5,24 +5,21 @@
 
 #define CELL_D 128
 
+typedef struct GroundSpriteSet
+{
+    int biome;
 
+    int numTilesHigh;
+    int numTilesWide;
 
-typedef struct GroundSpriteSet {
-        int biome;
-        
-        int numTilesHigh;
-        int numTilesWide;
-        
-        // indexed as [y][x]
-        SpriteHandle **tiles;
+    // indexed as [y][x]
+    SpriteHandle **tiles;
 
-        SpriteHandle **squareTiles;
+    SpriteHandle **squareTiles;
 
-        // all tiles together in one image
-        SpriteHandle wholeSheet;
-    } GroundSpriteSet;
-
-
+    // all tiles together in one image
+    SpriteHandle wholeSheet;
+} GroundSpriteSet;
 
 // array sized for largest biome ID for direct indexing
 // sparse, with NULL entries
@@ -31,14 +28,11 @@ typedef struct GroundSpriteSet {
 extern int groundSpritesArraySize;
 extern GroundSpriteSet **groundSprites;
 
-
 // object bank must be inited first
-
-
 
 // loads from objects folder
 // returns number of ground tiles that need to be loaded
-int initGroundSpritesStart( char inPrintSteps=true );
+int initGroundSpritesStart(char inPrintSteps = true);
 
 // returns progress... ready for Finish when progress == 1.0
 float initGroundSpritesStep();

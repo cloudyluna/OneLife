@@ -1,18 +1,15 @@
 #include "minorGems/game/doublePair.h"
 
-
 void initAgeControl();
 
-
 // returns 0,0 if inAge is -1
-doublePair getAgeHeadOffset( double inAge, doublePair inHeadSpritePos,
-                             doublePair inBodySpritePos,
-                             doublePair inFrontFootSpritePos );
+doublePair getAgeHeadOffset(double inAge, doublePair inHeadSpritePos, doublePair inBodySpritePos,
+                            doublePair inFrontFootSpritePos);
 
-doublePair getAgeBodyOffset( double inAge, doublePair inBodySpritePos );
+doublePair getAgeBodyOffset(double inAge, doublePair inBodySpritePos);
 
 void initAgeScaling();
 
-double computeDisplayAge( double serverAge );
+double computeDisplayAge(double serverAge);
 
-double computeServerAge( double displayAge );
+double computeServerAge(double displayAge);

@@ -1,5 +1,5 @@
 /*
- compile with 
+ compile with
 
 g++ -g -I../.. -o testFolderCache testFolderCache.cpp folderCache.cpp \
 ../../minorGems/io/file/linux/PathLinux.cpp \
@@ -8,35 +8,32 @@ g++ -g -I../.. -o testFolderCache testFolderCache.cpp folderCache.cpp \
 ../../minorGems/system/unix/TimeUnix.cpp
 */
 
-
 #include "folderCache.h"
 
 #include "minorGems/system/Time.h"
 
-
-int main() {
+int main()
+{
 
     double startTime = Time::getCurrentTime();
 
-    FolderCache c = initFolderCache( "objects" );
+    FolderCache c = initFolderCache("objects");
 
-    printf( "Init took %f seconds\n", 
-            Time::getCurrentTime() - startTime );
+    printf("Init took %f seconds\n", Time::getCurrentTime() - startTime);
 
+    for (int i = 0; i < c.numFiles; i++)
+    {
+        char *name = getFileName(c, i);
 
-    for( int i=0; i<c.numFiles; i++ ) {
-        char *name = getFileName( c, i );
-        
-        char *contents = 
-            getFileContents( c, i );
+        char *contents = getFileContents(c, i);
 
-        if( false )printf( "Cache reading file %s, length %d\n", 
-                name, strlen( contents ) );
+        if (false)
+            printf("Cache reading file %s, length %d\n", name, strlen(contents));
 
-        delete [] name;
-        delete [] contents;
-        }
-    freeFolderCache( c );
-    
-    return 1;
+        delete[] name;
+        delete[] contents;
     }
+    freeFolderCache(c);
+
+    return 1;
+}

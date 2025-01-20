@@ -1,46 +1,38 @@
 #include "GamePage.h"
 
-
-
 #include "minorGems/ui/event/ActionListener.h"
 
-
-#include "TextButton.h"
 #include "RadioButtonSet.h"
+#include "TextButton.h"
 
+class PollPage : public GamePage, public ActionListener
+{
 
-class PollPage : public GamePage, public ActionListener {
+  public:
+    PollPage(const char *inReviewServerURL);
+    ~PollPage();
 
-    public:
-        PollPage( const char *inReviewServerURL );
-        ~PollPage();
-        
+    virtual void actionPerformed(GUIComponent *inTarget);
 
-        virtual void actionPerformed( GUIComponent *inTarget );
+    virtual void draw(doublePair inViewCenter, double inViewSize);
 
-        virtual void draw( doublePair inViewCenter, 
-                           double inViewSize );
+    virtual void makeActive(char inFresh);
 
-        virtual void makeActive( char inFresh );
-        
-        virtual void step();
+    virtual void step();
 
-    protected:
-        char *mReviewServerURL;
-        
-        TextButton mSubmitButton;
-        
-        int mPollID;
-        
-        char *mQuestion;
-        
-        RadioButtonSet *mAnswerButtons;
+  protected:
+    char *mReviewServerURL;
 
-        char mWebRequestIsSubmit;
-        int mWebRequest;
-        
+    TextButton mSubmitButton;
 
-        int measureSplitQuestion();
-        
+    int mPollID;
 
-    };
+    char *mQuestion;
+
+    RadioButtonSet *mAnswerButtons;
+
+    char mWebRequestIsSubmit;
+    int mWebRequest;
+
+    int measureSplitQuestion();
+};

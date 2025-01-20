@@ -1,40 +1,31 @@
 #include "GamePage.h"
 
-
-
 #include "minorGems/ui/event/ActionListener.h"
-
 
 #include "TextButton.h"
 
+class ExtendedMessagePage : public GamePage, public ActionListener
+{
 
-class ExtendedMessagePage : public GamePage, public ActionListener {
-        
-    public:
-        ExtendedMessagePage();
-        ~ExtendedMessagePage();
-        
+  public:
+    ExtendedMessagePage();
+    ~ExtendedMessagePage();
 
-        void setMessageKey( const char *inMessageKey );
+    void setMessageKey(const char *inMessageKey);
 
-        // returns empty string if null
-        char *getMessageKey(); // for discord controller 
-        
-        // destroyed by caller
-        void setSubMessage( const char *inMessage );
-        
+    // returns empty string if null
+    char *getMessageKey(); // for discord controller
 
-        virtual void actionPerformed( GUIComponent *inTarget );
+    // destroyed by caller
+    void setSubMessage(const char *inMessage);
 
-        virtual void draw( doublePair inViewCenter, 
-                           double inViewSize );
-        
-    protected:
-        
-        TextButton mOKButton;
+    virtual void actionPerformed(GUIComponent *inTarget);
 
-        const char *mMessageKey;
-        char *mSubMessage;
+    virtual void draw(doublePair inViewCenter, double inViewSize);
 
+  protected:
+    TextButton mOKButton;
 
-    };
+    const char *mMessageKey;
+    char *mSubMessage;
+};

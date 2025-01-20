@@ -8,41 +8,30 @@
 // requests are sent to the server.
 
 // Prevents unexpected request inerleavings (important in this case because
-// most requests have non-repetable sequence numbers in them 
+// most requests have non-repetable sequence numbers in them
 // (to thwart replay attacks), and the server only tracks the last sequence
 // number used.  If requests arrive at the server out-of-order, then
 // the server rejects some of them as stale.
 
+int startWebRequestSerial(const char *inMethod, const char *inURL, const char *inBody);
 
+int stepWebRequestSerial(int inHandle);
 
-int startWebRequestSerial( const char *inMethod, const char *inURL,
-                           const char *inBody );
+char *getWebResultSerial(int inHandle);
 
-int stepWebRequestSerial( int inHandle );
-
-
-char *getWebResultSerial( int inHandle );
-
-unsigned char *getWebResultSerial( int inHandle, int *outSize );
-
-
+unsigned char *getWebResultSerial(int inHandle, int *outSize);
 
 // 0 if running as normal
 // 1 if seems slow (half of retry time passed)
 // 2+ if retrying (where getWebResultSerial() - 1 is the retry count so far).
-int getWebRequestRetryStatus( int inHandle );
-
-
+int getWebRequestRetryStatus(int inHandle);
 
 // does not wait for request to finish before ending it
-void clearWebRequestSerial( int inHandle );
-
-
+void clearWebRequestSerial(int inHandle);
 
 // true if server shut down and client should stop immediately
 char getServerShutdown();
 
-
-// true if player permanently dead (out of fresh starts) and 
+// true if player permanently dead (out of fresh starts) and
 // client should stop immediately
 char getPermadead();

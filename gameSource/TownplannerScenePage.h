@@ -1,11 +1,9 @@
 #ifndef EDITOR_SCENE_PAGE_INCLUDED
 #define EDITOR_SCENE_PAGE_INCLUDED
 
-
 #include "minorGems/ui/event/ActionListener.h"
 
 #include "minorGems/io/file/File.h"
-
 
 #include "GamePage.h"
 
@@ -13,8 +11,8 @@
 #include "TextButton.h"
 #include "ValueSlider.h"
 
-#include "objectBank.h"
 #include "animationBank.h"
+#include "objectBank.h"
 
 #include "keyLegend.h"
 
@@ -22,256 +20,237 @@
 
 #include <vector>
 
+typedef struct SceneCell
+{
+    int biome;
 
-typedef struct SceneCell {
-        int biome;
-        
-        int oID;
+    int oID;
 
-        int heldID;
-        
-        SimpleVector<int> contained;
-        SimpleVector< SimpleVector<int> > subContained;
+    int heldID;
 
-        ClothingSet clothing;
+    SimpleVector<int> contained;
+    SimpleVector<SimpleVector<int>> subContained;
 
-        char flipH;
-        double age;
-        
-        double heldAge;
-        ClothingSet heldClothing;
-        Emotion *heldEmotion;
-        SimpleVector<Emotion*> heldExtraEmotion;
-        
-        double returnAge;
-        double returnHeldAge;
+    ClothingSet clothing;
 
-        AnimType anim;
-        
-        // negative to unfreeze time for cell, or positive to freeze
-        // time at a given point
-        double frozenAnimTime;
-        
-        // for vanishing/appearing sprites based on use
-        int numUsesRemaining;
+    char flipH;
+    double age;
 
-        // for vanishing sprites based on variable object number
-        int varNumber;
-        
+    double heldAge;
+    ClothingSet heldClothing;
+    Emotion *heldEmotion;
+    SimpleVector<Emotion *> heldExtraEmotion;
 
-        int xOffset;
-        int yOffset;
-        
-        // for moving cell, where they should end up
-        int destCellXOffset;
-        int destCellYOffset;
+    double returnAge;
+    double returnHeldAge;
 
-        // for live display only (not saved)
-        double moveFractionDone;
+    AnimType anim;
 
-        // current move offset in pixels
-        doublePair moveOffset;
-        
-        double moveDelayTime;
-        
-        double moveStartTime;
-        
-        int frameCount;
-        
+    // negative to unfreeze time for cell, or positive to freeze
+    // time at a given point
+    double frozenAnimTime;
 
-        int graveID;
-        
-        Emotion *currentEmot;
-        SimpleVector<Emotion*> extraEmot;
-        
-    } SceneCell;
+    // for vanishing/appearing sprites based on use
+    int numUsesRemaining;
 
+    // for vanishing sprites based on variable object number
+    int varNumber;
 
-    
+    int xOffset;
+    int yOffset;
 
-class EditorScenePage : public GamePage, public ActionListener {
-        
-    public:
-        EditorScenePage();
-        ~EditorScenePage();
-    
-        virtual void actionPerformed( GUIComponent *inTarget );
+    // for moving cell, where they should end up
+    int destCellXOffset;
+    int destCellYOffset;
 
+    // for live display only (not saved)
+    double moveFractionDone;
 
-        virtual void drawUnderComponents( doublePair inViewCenter, 
-                                          double inViewSize );
-        
-        virtual void makeActive( char inFresh );
-        
-        virtual void step();
+    // current move offset in pixels
+    doublePair moveOffset;
 
-		virtual void pointerUp( float inX, float inY );
-		virtual void pointerDown( float inX, float inY );
-		virtual void pointerMove( float inX, float inY );
-		virtual void pointerDrag( float inX, float inY );
+    double moveDelayTime;
 
-        virtual void keyDown( unsigned char inASCII );
-        virtual void keyUp( unsigned char inASCII );
-        virtual void specialKeyDown( int inKeyCode );
-        
-        
-    protected:
-        char mPlayingTime;
-        char mRecordingFrames;
-        
-		TextButton mUndoButton;
-		TextButton mRedoButton;
-		
-        TextButton mAnimEditorButton;
-        
-        TextButton mSaveNewButton;
-        TextButton mReplaceButton;
-		TextButton mConfirmReplaceButton;
-        TextButton mDeleteButton;
-		TextButton mConfirmDeleteButton;
-        
-        TextButton mSaveTestMapButton;
+    double moveStartTime;
 
-        TextButton mNextSceneButton;
-        TextButton mPrevSceneButton;
+    int frameCount;
 
+    int graveID;
 
-        TextButton mClearSceneButton;
+    Emotion *currentEmot;
+    SimpleVector<Emotion *> extraEmot;
 
-        Picker mGroundPicker;
-        Picker mObjectPicker;
-        
-        ValueSlider mPersonAgeSlider;
-        
-        RadioButtonSet mCellAnimRadioButtons;
-        RadioButtonSet mPersonAnimRadioButtons;
-        
-        ValueSlider mCellAnimFreezeSlider;
-        ValueSlider mPersonAnimFreezeSlider;
-        
-        ValueSlider mCellSpriteVanishSlider;
-        ValueSlider mCellSpriteVarSlider;
+} SceneCell;
 
-        ValueSlider mCellXOffsetSlider;
-        ValueSlider mCellYOffsetSlider;
+class EditorScenePage : public GamePage, public ActionListener
+{
 
-        ValueSlider mPersonXOffsetSlider;
-        ValueSlider mPersonYOffsetSlider;
-        
-        TextField mCellMoveDelayField;
-        TextField mPersonMoveDelayField;
-        
-        TextField mPersonEmotField;
+  public:
+    EditorScenePage();
+    ~EditorScenePage();
 
-        
-        SpriteHandle mCellDestSprite;
-        SpriteHandle mPersonDestSprite;
+    virtual void actionPerformed(GUIComponent *inTarget);
 
-        SpriteHandle mGroundOverlaySprite[4];
-        
-        SpriteHandle mFloorSplitSprite;
-        
+    virtual void drawUnderComponents(doublePair inViewCenter, double inViewSize);
 
-        char mShowUI;
-        char mShowWhite;
-        
-        float mCursorFade;
-        
-        int mSceneW, mSceneH;
-        
-        int mSceneID;
+    virtual void makeActive(char inFresh);
 
-        SceneCell **mCells;
-        SceneCell **mPersonCells;
-        SceneCell **mFloorCells;
-        
-        SceneCell mEmptyCell;
-        SceneCell mCopyBuffer;
-        SceneCell mCopyFloorBuffer;
-        
-        
-        // when we get near edge of screen with cell selection, we
-        // shift everything into the center
-        int mShiftX, mShiftY;
-        
-        int mCurX, mCurY;
-		int cursorGridX, cursorGridY;
-		int cursorX, cursorY;
-        
-        // location of origing in scene
-        int mZeroX, mZeroY;
+    virtual void step();
 
-        double mFrameCount;
-        
-        char mLittleDheld;
-        char mBigDheld;
+    virtual void pointerUp(float inX, float inY);
+    virtual void pointerDown(float inX, float inY);
+    virtual void pointerMove(float inX, float inY);
+    virtual void pointerDrag(float inX, float inY);
 
-        File mScenesFolder;
-        File *mNextFile;
-        int mNextSceneNumber;
-        
+    virtual void keyDown(unsigned char inASCII);
+    virtual void keyUp(unsigned char inASCII);
+    virtual void specialKeyDown(int inKeyCode);
 
-        KeyLegend mKeyLegend, mKeyLegendG, mKeyLegendC, mKeyLegendP, 
-            mKeyLegendF;
-		
-		bool mObjectPickerClicked;
-		bool mGroundPickerClicked;
-		int pickedOID;
-		int pickedGID;
+  protected:
+    char mPlayingTime;
+    char mRecordingFrames;
 
+    TextButton mUndoButton;
+    TextButton mRedoButton;
 
-        void floodFill( int inX, int inY, int inOldBiome, int inNewBiome );
-        
+    TextButton mAnimEditorButton;
 
-        void drawGroundOverlaySprites();
-        
-        // check which GUI components should be visible
-        void checkVisible();
-		
-		bool hoverAnyUI( float inX, float inY );
+    TextButton mSaveNewButton;
+    TextButton mReplaceButton;
+    TextButton mConfirmReplaceButton;
+    TextButton mDeleteButton;
+    TextButton mConfirmDeleteButton;
 
-        SceneCell *getCurrentCell();
-        SceneCell *getCurrentPersonCell();
-        SceneCell *getCurrentFloorCell();
-		SceneCell *getCell(int absX, int absY);
-		SceneCell *getFloorCell(int absX, int absY);
-		
-		void destroySceneCellArray( SceneCell ***array );
-		SceneCell **copySceneCellArray( SceneCell **array );
-		void queuesPopBack();
-		void queuesPopFront();
-		void applySceneCellArrays( SceneCell **cells, SceneCell **floorCells );
-		
-        void mark( int x, int y, int beforeOrAfter );
-		void backup();
-		void undo();
-		void redo();
-        void flashTile( int x, int y );
-        
-        // clear everything but biome
-        void clearCell( SceneCell *inCell );
-        
-        void clearScene();
-        
+    TextButton mSaveTestMapButton;
 
-        void restartAllMoves();
-        
-        std::vector<File*> getSceneFiles();
-        
-        int getSceneFileID( char *fileName );
+    TextButton mNextSceneButton;
+    TextButton mPrevSceneButton;
 
-        File *getSceneFile( int inSceneID );
-        
-        char tryLoadScene( int inSceneID );
-        
-        void writeSceneToFile( int inIDToUse );
-        
-        void checkNextPrevVisible();
-        
-        void resizeGrid( int inNewH, int inNewW );
-    };
+    TextButton mClearSceneButton;
 
-        
+    Picker mGroundPicker;
+    Picker mObjectPicker;
 
+    ValueSlider mPersonAgeSlider;
+
+    RadioButtonSet mCellAnimRadioButtons;
+    RadioButtonSet mPersonAnimRadioButtons;
+
+    ValueSlider mCellAnimFreezeSlider;
+    ValueSlider mPersonAnimFreezeSlider;
+
+    ValueSlider mCellSpriteVanishSlider;
+    ValueSlider mCellSpriteVarSlider;
+
+    ValueSlider mCellXOffsetSlider;
+    ValueSlider mCellYOffsetSlider;
+
+    ValueSlider mPersonXOffsetSlider;
+    ValueSlider mPersonYOffsetSlider;
+
+    TextField mCellMoveDelayField;
+    TextField mPersonMoveDelayField;
+
+    TextField mPersonEmotField;
+
+    SpriteHandle mCellDestSprite;
+    SpriteHandle mPersonDestSprite;
+
+    SpriteHandle mGroundOverlaySprite[4];
+
+    SpriteHandle mFloorSplitSprite;
+
+    char mShowUI;
+    char mShowWhite;
+
+    float mCursorFade;
+
+    int mSceneW, mSceneH;
+
+    int mSceneID;
+
+    SceneCell **mCells;
+    SceneCell **mPersonCells;
+    SceneCell **mFloorCells;
+
+    SceneCell mEmptyCell;
+    SceneCell mCopyBuffer;
+    SceneCell mCopyFloorBuffer;
+
+    // when we get near edge of screen with cell selection, we
+    // shift everything into the center
+    int mShiftX, mShiftY;
+
+    int mCurX, mCurY;
+    int cursorGridX, cursorGridY;
+    int cursorX, cursorY;
+
+    // location of origing in scene
+    int mZeroX, mZeroY;
+
+    double mFrameCount;
+
+    char mLittleDheld;
+    char mBigDheld;
+
+    File mScenesFolder;
+    File *mNextFile;
+    int mNextSceneNumber;
+
+    KeyLegend mKeyLegend, mKeyLegendG, mKeyLegendC, mKeyLegendP, mKeyLegendF;
+
+    bool mObjectPickerClicked;
+    bool mGroundPickerClicked;
+    int pickedOID;
+    int pickedGID;
+
+    void floodFill(int inX, int inY, int inOldBiome, int inNewBiome);
+
+    void drawGroundOverlaySprites();
+
+    // check which GUI components should be visible
+    void checkVisible();
+
+    bool hoverAnyUI(float inX, float inY);
+
+    SceneCell *getCurrentCell();
+    SceneCell *getCurrentPersonCell();
+    SceneCell *getCurrentFloorCell();
+    SceneCell *getCell(int absX, int absY);
+    SceneCell *getFloorCell(int absX, int absY);
+
+    void destroySceneCellArray(SceneCell ***array);
+    SceneCell **copySceneCellArray(SceneCell **array);
+    void queuesPopBack();
+    void queuesPopFront();
+    void applySceneCellArrays(SceneCell **cells, SceneCell **floorCells);
+
+    void mark(int x, int y, int beforeOrAfter);
+    void backup();
+    void undo();
+    void redo();
+    void flashTile(int x, int y);
+
+    // clear everything but biome
+    void clearCell(SceneCell *inCell);
+
+    void clearScene();
+
+    void restartAllMoves();
+
+    std::vector<File *> getSceneFiles();
+
+    int getSceneFileID(char *fileName);
+
+    File *getSceneFile(int inSceneID);
+
+    char tryLoadScene(int inSceneID);
+
+    void writeSceneToFile(int inIDToUse);
+
+    void checkNextPrevVisible();
+
+    void resizeGrid(int inNewH, int inNewW);
+};
 
 #endif

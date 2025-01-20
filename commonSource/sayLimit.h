@@ -1,3 +1,3 @@
 
 
-int getSayLimit( double inAge );
+int getSayLimit(double inAge);

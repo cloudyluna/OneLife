@@ -2,44 +2,25 @@
 
 #include <stdint.h>
 
-
-typedef void* OGGHandle;
-
-
+typedef void *OGGHandle;
 
 // returns NULL on failure
 
 // opens OGG file
-OGGHandle openOGG( File *inOggFile );
+OGGHandle openOGG(File *inOggFile);
 // opens OGG data from a memory buffer
-OGGHandle openOGG( unsigned char *inAllBytes, int inLength );
+OGGHandle openOGG(unsigned char *inAllBytes, int inLength);
 
+int getOGGChannels(OGGHandle inOGG);
 
-int getOGGChannels( OGGHandle inOGG );
-
-
-int getOGGTotalSamples( OGGHandle inOGG );
-
-
+int getOGGTotalSamples(OGGHandle inOGG);
 
 // returns the number of samples read
-int readNextSamplesOGG( OGGHandle inOGG,
-                        int inNumSamples, 
-                        float *inLeftBuffer,
-                        float *inRightBuffer );
+int readNextSamplesOGG(OGGHandle inOGG, int inNumSamples, float *inLeftBuffer, float *inRightBuffer);
 
+void readAllMonoSamplesOGG(OGGHandle inOGG, int16_t *inMonoBuffer);
 
-void readAllMonoSamplesOGG( OGGHandle inOGG,
-                            int16_t *inMonoBuffer );
+// seeks in the OGG
+char seekOGG(OGGHandle inOGG, int inNextSample);
 
-
-// seeks in the OGG 
-char seekOGG( OGGHandle inOGG, int inNextSample );
-
-
-
-
-void closeOGG( OGGHandle inOGG );
-
-
-
+void closeOGG(OGGHandle inOGG);

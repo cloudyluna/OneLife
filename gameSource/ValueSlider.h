@@ -1,91 +1,76 @@
 #ifndef VALUE_SLIDER_INCLUDED
 #define VALUE_SLIDER_INCLUDED
 
-
 #include "PageComponent.h"
 #include "TextField.h"
 
 #include "minorGems/game/Font.h"
 #include "minorGems/ui/event/ActionListenerList.h"
 
+class ValueSlider : public PageComponent, public ActionListenerList, public ActionListener
+{
 
-class ValueSlider : public PageComponent, public ActionListenerList,
-                    public ActionListener {
-        
-    public:
+  public:
+    ValueSlider(Font *inDisplayFont, double inX, double inY,
+                // thickness of border
+                double inBorder,
+                // size of slider bar, not including text field
+                double inWidth, double inHeight, double inLowValue, double inHighValue, const char *inLabelText,
+                char inDrawLabelWithShadow = false);
 
-        ValueSlider( Font *inDisplayFont, 
-                     double inX, double inY,
-                     // thickness of border
-                     double inBorder,
-                     // size of slider bar, not including text field
-                     double inWidth, double inHeight,
-                     double inLowValue,
-                     double inHighValue,
-                     const char *inLabelText,
-                     char inDrawLabelWithShadow = false );
-        
-        ~ValueSlider();
-        
-        
-        double getValue();
-        void setValue( double inValue );
+    ~ValueSlider();
 
-        void setHighValue( double inHighValue );
-        
-        double getHighValue();
-        
+    double getValue();
+    void setValue(double inValue);
 
-        char isPointerDown();
-        
+    void setHighValue(double inHighValue);
 
-        void setFillColor( Color inColor );
-        void setBackFillColor( Color inColor );
+    double getHighValue();
 
-        // toggles whether a text field is visible next to the slider
-        // defaults to true
-        void toggleField( char inFieldVisible );
-        
+    char isPointerDown();
 
-        // usually automatic based on slider range
-        // but can be forced to control precision
-        void forceDecimalDigits( int inNumDigitsAfterDecimal );
-        
+    void setFillColor(Color inColor);
+    void setBackFillColor(Color inColor);
 
-    protected:
-        virtual void actionPerformed( GUIComponent *inTarget );
+    // toggles whether a text field is visible next to the slider
+    // defaults to true
+    void toggleField(char inFieldVisible);
 
-        virtual void draw();
+    // usually automatic based on slider range
+    // but can be forced to control precision
+    void forceDecimalDigits(int inNumDigitsAfterDecimal);
 
-        virtual void pointerDown( float inX, float inY );
-        virtual void pointerDrag( float inX, float inY );
-        
-        // fires action performed to listener list
-        virtual void pointerUp( float inX, float inY );        
+  protected:
+    virtual void actionPerformed(GUIComponent *inTarget);
 
-        char isInBar( float inX, float inY );
+    virtual void draw();
 
-        void setFieldFromValue();
-        
-        
-        Color mFillColor;
-        Color mBackFillColor;
-        
-        Font *mFont;
-        TextField mValueField;
+    virtual void pointerDown(float inX, float inY);
+    virtual void pointerDrag(float inX, float inY);
 
-        double mLowValue, mHighValue;
-        double mValue;
-        
+    // fires action performed to listener list
+    virtual void pointerUp(float inX, float inY);
 
-        double mBarBorder;
-        double mBarStartX, mBarEndX, mBarStartY, mBarEndY;
+    char isInBar(float inX, float inY);
 
-        char mPointerDown;
+    void setFieldFromValue();
 
-        char mForceDecimalDigits;
-        int mDecimalDigits;
-    };
+    Color mFillColor;
+    Color mBackFillColor;
 
+    Font *mFont;
+    TextField mValueField;
+
+    double mLowValue, mHighValue;
+    double mValue;
+
+    double mBarBorder;
+    double mBarStartX, mBarEndX, mBarStartY, mBarEndY;
+
+    char mPointerDown;
+
+    char mForceDecimalDigits;
+    int mDecimalDigits;
+};
 
 #endif

@@ -1,19 +1,15 @@
 #ifndef EDITOR_TRANSITION_PAGE_INCLUDED
 #define EDITOR_TRANSITION_PAGE_INCLUDED
 
-
-
-
 #include "minorGems/ui/event/ActionListener.h"
 #include "minorGems/util/SimpleVector.h"
 
 #include "minorGems/game/game.h"
 
-
 #include "GamePage.h"
+#include "SpriteButton.h"
 #include "TextButton.h"
 #include "TextField.h"
-#include "SpriteButton.h"
 
 #include "CheckboxButton.h"
 
@@ -21,118 +17,104 @@
 
 #include "Picker.h"
 
-#include "transitionBank.h"
 #include "objectBank.h"
-
-
+#include "transitionBank.h"
 
 #define NUM_TREE_TRANS_TO_SHOW 1
 
+class EditorTransitionPage : public GamePage, public ActionListener
+{
 
+  public:
+    EditorTransitionPage();
+    ~EditorTransitionPage();
 
-class EditorTransitionPage : public GamePage, public ActionListener {
-        
-    public:
-        EditorTransitionPage();
-        ~EditorTransitionPage();
+    void clearUseOfObject(int inObjectID);
 
-        void clearUseOfObject( int inObjectID );
-        
+    virtual void actionPerformed(GUIComponent *inTarget);
 
-        virtual void actionPerformed( GUIComponent *inTarget );
-        
-        virtual void draw( doublePair inViewCenter, 
-                           double inViewSize );
-        
-        virtual void step();
-  
-        virtual void makeActive( char inFresh );
-        
+    virtual void draw(doublePair inViewCenter, double inViewSize);
 
-        virtual void pointerMove( float inX, float inY );
-        virtual void pointerDown( float inX, float inY );
-        virtual void pointerDrag( float inX, float inY );
-        virtual void pointerUp( float inX, float inY );
-        
-        virtual void keyDown( unsigned char inASCII );
-        virtual void specialKeyDown( int inKeyCode );
-        
-    protected:
-        
-        TextField mAutoDecayTimeField;
-        
-        RadioButtonSet mContTransModesButtons;
-        
-        CheckboxButton mLastUseActorCheckbox;
-        CheckboxButton mLastUseTargetCheckbox;
+    virtual void step();
 
-        CheckboxButton mReverseUseActorCheckbox;
-        CheckboxButton mReverseUseTargetCheckbox;
+    virtual void makeActive(char inFresh);
 
-        CheckboxButton mNoUseActorCheckbox;
-        CheckboxButton mNoUseTargetCheckbox;
-        
-        RadioButtonSet mMovementButtons;
-        
-        TextField mDesiredMoveDistField;
-        
-        TextField mActorMinUseFractionField, mTargetMinUseFractionField;
+    virtual void pointerMove(float inX, float inY);
+    virtual void pointerDown(float inX, float inY);
+    virtual void pointerDrag(float inX, float inY);
+    virtual void pointerUp(float inX, float inY);
 
-        TextButton mSaveTransitionButton;
-        Picker mObjectPicker;
-        
-        Picker mObjectPickerAlt;
+    virtual void keyDown(unsigned char inASCII);
+    virtual void specialKeyDown(int inKeyCode);
 
-        TextButton mObjectEditorButton;
-        TextButton mCategoryEditorButton;
+  protected:
+    TextField mAutoDecayTimeField;
 
-        TransRecord mCurrentTransition;
+    RadioButtonSet mContTransModesButtons;
 
-        int mCurrentlyReplacing;
+    CheckboxButton mLastUseActorCheckbox;
+    CheckboxButton mLastUseTargetCheckbox;
 
-        Button *mPickButtons[4];
-        
-        TextButton *mClearButtons[4];
-        
-        
-        int mLastSearchID;
+    CheckboxButton mReverseUseActorCheckbox;
+    CheckboxButton mReverseUseTargetCheckbox;
 
-        int mProducedBySkip;
-        TransRecord mProducedBy[NUM_TREE_TRANS_TO_SHOW];
-        // 0 for normal, 1 for category-based, 2 for pattern-based
-        int mProducedByType[NUM_TREE_TRANS_TO_SHOW];
-        Button *mProducedByButtons[NUM_TREE_TRANS_TO_SHOW];
-        
-        TextButton mProducedByNext;
-        TextButton mProducedByPrev;
-        
+    CheckboxButton mNoUseActorCheckbox;
+    CheckboxButton mNoUseTargetCheckbox;
 
-        int mProducesSkip;
-        TransRecord mProduces[NUM_TREE_TRANS_TO_SHOW];
-        // 0 for normal, 1 for category-based, 2 for pattern-based
-        int mProducesType[NUM_TREE_TRANS_TO_SHOW];
-        Button *mProducesButtons[NUM_TREE_TRANS_TO_SHOW];
-        
-        TextButton mProducesNext;
-        TextButton mProducesPrev;
-        
-        
-        TextButton mDelButton;
-        TextButton mDelConfirmButton;
-        
+    RadioButtonSet mMovementButtons;
 
-        SpriteButton mSwapActorButton;
-        SpriteButton mSwapTargetButton;
+    TextField mDesiredMoveDistField;
 
-        SpriteButton mSwapTopButton;
-        SpriteButton mSwapBottomButton;
+    TextField mActorMinUseFractionField, mTargetMinUseFractionField;
 
-        void checkIfSaveVisible();
+    TextButton mSaveTransitionButton;
+    Picker mObjectPicker;
 
-        void redoTransSearches( int inObjectID, char inClearSkip );
-        
-    };
+    Picker mObjectPickerAlt;
 
+    TextButton mObjectEditorButton;
+    TextButton mCategoryEditorButton;
 
+    TransRecord mCurrentTransition;
+
+    int mCurrentlyReplacing;
+
+    Button *mPickButtons[4];
+
+    TextButton *mClearButtons[4];
+
+    int mLastSearchID;
+
+    int mProducedBySkip;
+    TransRecord mProducedBy[NUM_TREE_TRANS_TO_SHOW];
+    // 0 for normal, 1 for category-based, 2 for pattern-based
+    int mProducedByType[NUM_TREE_TRANS_TO_SHOW];
+    Button *mProducedByButtons[NUM_TREE_TRANS_TO_SHOW];
+
+    TextButton mProducedByNext;
+    TextButton mProducedByPrev;
+
+    int mProducesSkip;
+    TransRecord mProduces[NUM_TREE_TRANS_TO_SHOW];
+    // 0 for normal, 1 for category-based, 2 for pattern-based
+    int mProducesType[NUM_TREE_TRANS_TO_SHOW];
+    Button *mProducesButtons[NUM_TREE_TRANS_TO_SHOW];
+
+    TextButton mProducesNext;
+    TextButton mProducesPrev;
+
+    TextButton mDelButton;
+    TextButton mDelConfirmButton;
+
+    SpriteButton mSwapActorButton;
+    SpriteButton mSwapTargetButton;
+
+    SpriteButton mSwapTopButton;
+    SpriteButton mSwapBottomButton;
+
+    void checkIfSaveVisible();
+
+    void redoTransSearches(int inObjectID, char inClearSkip);
+};
 
 #endif

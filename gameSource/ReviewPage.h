@@ -1,68 +1,56 @@
 #include "ServerActionPage.h"
 
-#include "TextButton.h"
-#include "TextArea.h"
-#include "TextField.h"
 #include "RadioButtonSet.h"
-
+#include "TextArea.h"
+#include "TextButton.h"
+#include "TextField.h"
 
 #include "minorGems/ui/event/ActionListener.h"
 
+class ReviewPage : public ServerActionPage, public ActionListener
+{
 
+  public:
+    ReviewPage(const char *inReviewServerURL);
+    ~ReviewPage();
 
+    virtual void draw(doublePair inViewCenter, double inViewSize);
 
-class ReviewPage : public ServerActionPage, public ActionListener {
-        
-    public:
-        
-        ReviewPage( const char *inReviewServerURL );
-        ~ReviewPage();
-        
+    virtual void step();
 
-        virtual void draw( doublePair inViewCenter, 
-                           double inViewSize );
+    virtual void actionPerformed(GUIComponent *inTarget);
 
-        virtual void step();
+    virtual void keyDown(unsigned char inASCII);
 
-        virtual void actionPerformed( GUIComponent *inTarget );
-        
-        virtual void keyDown( unsigned char inASCII );
+    virtual void makeActive(char inFresh);
+    virtual void makeNotActive();
 
-        
-        virtual void makeActive( char inFresh );
-        virtual void makeNotActive();
+  protected:
+    TextField mReviewNameField;
 
-    protected:
+    RadioButtonSet *mRecommendChoice;
 
-        TextField mReviewNameField;
-        
-        RadioButtonSet *mRecommendChoice;
+    TextArea mReviewTextArea;
 
-        TextArea mReviewTextArea;
-        
-        CheckboxButton mSpellcheckButton;
+    CheckboxButton mSpellcheckButton;
 
-        TextButton mBackButton;
+    TextButton mBackButton;
 
-        
-        TextButton mPostButton;
-        TextButton mRemoveButton;
-        
+    TextButton mPostButton;
+    TextButton mRemoveButton;
 
-        TextButton mCopyButton;
-        TextButton mPasteButton;
+    TextButton mCopyButton;
+    TextButton mPasteButton;
 
-        TextButton mClearButton;
-        
-        char mGettingSequenceNumber;
-        char mRemoving;
-        
+    TextButton mClearButton;
 
-        void switchFields();
+    char mGettingSequenceNumber;
+    char mRemoving;
 
-        void checkCanPost();
-        void checkCanPaste();
-        
-        void saveReview();
+    void switchFields();
 
-    };
+    void checkCanPost();
+    void checkCanPaste();
+
+    void saveReview();
+};

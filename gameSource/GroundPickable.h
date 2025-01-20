@@ -1,133 +1,127 @@
 #ifndef GROUND_PICKABLE_INCLUDED
 #define GROUND_PICKABLE_INCLUDED
 
-
 #include "Pickable.h"
-
 
 #include "groundSprites.h"
 #include "objectBank.h"
 
-
-#define QUOTE( arg )  #arg
-#define STRING_VAL( arg )  QUOTE( arg )
+#define QUOTE(arg) #arg
+#define STRING_VAL(arg) QUOTE(arg)
 #define NUM_GROUND_STRING_NAMES 30
 
+class GroundPickable : public Pickable
+{
 
-class GroundPickable : public Pickable {
-        
-    public:
-        virtual void **search( const char *inSearch, 
-                               int inNumToSkip, 
-                               int inNumToGet, 
-                               int *outNumResults, int *outNumRemaining ) {
-            
-            // ignore search strings
+  public:
+    virtual void **search(const char *inSearch, int inNumToSkip, int inNumToGet, int *outNumResults,
+                          int *outNumRemaining)
+    {
 
-            SimpleVector<int> allBiomes;
-            
-            getAllBiomes( &allBiomes );
+        // ignore search strings
 
-            SimpleVector<GroundSpriteSet*> allGround;
-            
-            for( int i=0; i<allBiomes.size(); i++ ) {
-                
-                int b = allBiomes.getElementDirect( i );
-                
-                if( groundSprites[ b ] != NULL ) {
-                    allGround.push_back( groundSprites[ b ] );
-                    }
-                }
+        SimpleVector<int> allBiomes;
 
-            *outNumResults = 0;
-            
-            if( inNumToSkip < allGround.size() ) {
-                *outNumResults = allGround.size() - inNumToSkip;
-                }
-            
-            *outNumRemaining = 0;
-            
-            if( *outNumResults > inNumToGet ) {
-                *outNumRemaining = *outNumResults - inNumToGet;
-                
-                *outNumResults = inNumToGet;
-                }
-            
-            void **results = new void *[ *outNumResults ];
+        getAllBiomes(&allBiomes);
 
-            for( int i=0; i<*outNumResults; i++ ) {
-                int g = i + inNumToSkip;
-                
-                results[i] = allGround.getElementDirect( g );
-                }
-            
-            return results;
+        SimpleVector<GroundSpriteSet *> allGround;
+
+        for (int i = 0; i < allBiomes.size(); i++)
+        {
+
+            int b = allBiomes.getElementDirect(i);
+
+            if (groundSprites[b] != NULL)
+            {
+                allGround.push_back(groundSprites[b]);
             }
-        
+        }
 
+        *outNumResults = 0;
 
-        virtual void draw( void *inObject, doublePair inPos ) {
-            GroundSpriteSet *r = (GroundSpriteSet*)inObject;
+        if (inNumToSkip < allGround.size())
+        {
+            *outNumResults = allGround.size() - inNumToSkip;
+        }
 
-            // don't access r->sprite directly here
-            // getSprite needed to invoke dynamic sprite loading
-            SpriteHandle sprite = r->squareTiles[0][0];
+        *outNumRemaining = 0;
 
-            double zoom = 0.4;
+        if (*outNumResults > inNumToGet)
+        {
+            *outNumRemaining = *outNumResults - inNumToGet;
 
-            drawSprite( sprite, inPos, zoom );
-            }
+            *outNumResults = inNumToGet;
+        }
 
+        void **results = new void *[*outNumResults];
 
-        virtual char isSearchable() {
-            return false;
-            }
-        
+        for (int i = 0; i < *outNumResults; i++)
+        {
+            int g = i + inNumToSkip;
 
-        virtual int getID( void *inObject ) {
-            GroundSpriteSet *r = (GroundSpriteSet*)inObject;
-            
-            return r->biome;
-            }
-        
+            results[i] = allGround.getElementDirect(g);
+        }
 
-        virtual char canDelete( int inID ) {
-            return false;
-            }
-        
-        
-        virtual void deleteID( int inID ) {
-            }
-        
-        
+        return results;
+    }
 
-        virtual const char *getText( void *inObject ) {
-            GroundSpriteSet *r = (GroundSpriteSet*)inObject;
+    virtual void draw(void *inObject, doublePair inPos)
+    {
+        GroundSpriteSet *r = (GroundSpriteSet *)inObject;
 
-            if( r->biome < NUM_GROUND_STRING_NAMES ) {
-                return sStringNames[r->biome];
-                }
-            else {
-                return "? >= " STRING_VAL( NUM_GROUND_STRING_NAMES );
-                }
-            }
+        // don't access r->sprite directly here
+        // getSprite needed to invoke dynamic sprite loading
+        SpriteHandle sprite = r->squareTiles[0][0];
 
-    protected:
-        
+        double zoom = 0.4;
 
-        virtual SimpleVector<int> *getStack() {
-            return &sStack;
-            }
+        drawSprite(sprite, inPos, zoom);
+    }
 
-        
-        static SimpleVector<int> sStack;
+    virtual char isSearchable()
+    {
+        return false;
+    }
 
+    virtual int getID(void *inObject)
+    {
+        GroundSpriteSet *r = (GroundSpriteSet *)inObject;
 
-        
-        static const char *sStringNames[ NUM_GROUND_STRING_NAMES ];
-        
-        
-    };
-        
+        return r->biome;
+    }
+
+    virtual char canDelete(int inID)
+    {
+        return false;
+    }
+
+    virtual void deleteID(int inID)
+    {
+    }
+
+    virtual const char *getText(void *inObject)
+    {
+        GroundSpriteSet *r = (GroundSpriteSet *)inObject;
+
+        if (r->biome < NUM_GROUND_STRING_NAMES)
+        {
+            return sStringNames[r->biome];
+        }
+        else
+        {
+            return "? >= " STRING_VAL(NUM_GROUND_STRING_NAMES);
+        }
+    }
+
+  protected:
+    virtual SimpleVector<int> *getStack()
+    {
+        return &sStack;
+    }
+
+    static SimpleVector<int> sStack;
+
+    static const char *sStringNames[NUM_GROUND_STRING_NAMES];
+};
 
 #endif

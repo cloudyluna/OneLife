@@ -1,9 +1,8 @@
 #include "spellCheck.h"
 
-#include "minorGems/util/SettingsManager.h"
 #include "minorGems/io/file/File.h"
 #include "minorGems/system/Time.h"
-
+#include "minorGems/util/SettingsManager.h"
 
 /*
 
@@ -50,8 +49,6 @@ Looking up psychiatry's 1M times took  106.000118 ms
 
 */
 
-
-
 //-----------------------------------------------------------------------------
 // MurmurHash2, by Austin Appleby
 
@@ -66,68 +63,66 @@ Looking up psychiatry's 1M times took  106.000118 ms
 // 2. It will not produce the same results on little-endian and big-endian
 //    machines.
 
-unsigned int MurmurHash2 ( const void * key, int len, unsigned int seed )
+unsigned int MurmurHash2(const void *key, int len, unsigned int seed)
 {
-	// 'm' and 'r' are mixing constants generated offline.
-	// They're not really 'magic', they just happen to work well.
+    // 'm' and 'r' are mixing constants generated offline.
+    // They're not really 'magic', they just happen to work well.
 
-	const unsigned int m = 0x5bd1e995;
-	const int r = 24;
+    const unsigned int m = 0x5bd1e995;
+    const int r = 24;
 
-	// Initialize the hash to a 'random' value
+    // Initialize the hash to a 'random' value
 
-	unsigned int h = seed ^ len;
+    unsigned int h = seed ^ len;
 
-	// Mix 4 bytes at a time into the hash
+    // Mix 4 bytes at a time into the hash
 
-	const unsigned char * data = (const unsigned char *)key;
+    const unsigned char *data = (const unsigned char *)key;
 
-	while(len >= 4)
-	{
-		unsigned int k = *(unsigned int *)data;
+    while (len >= 4)
+    {
+        unsigned int k = *(unsigned int *)data;
 
-		k *= m; 
-		k ^= k >> r; 
-		k *= m; 
-		
-		h *= m; 
-		h ^= k;
+        k *= m;
+        k ^= k >> r;
+        k *= m;
 
-		data += 4;
-		len -= 4;
-	}
-	
-	// Handle the last few bytes of the input array
+        h *= m;
+        h ^= k;
 
-	switch(len)
-	{
-	case 3: h ^= data[2] << 16;
-	case 2: h ^= data[1] << 8;
-	case 1: h ^= data[0];
-	        h *= m;
-	};
+        data += 4;
+        len -= 4;
+    }
 
-	// Do a few final mixes of the hash to ensure the last few
-	// bytes are well-incorporated.
+    // Handle the last few bytes of the input array
 
-	h ^= h >> 13;
-	h *= m;
-	h ^= h >> 15;
+    switch (len)
+    {
+    case 3:
+        h ^= data[2] << 16;
+    case 2:
+        h ^= data[1] << 8;
+    case 1:
+        h ^= data[0];
+        h *= m;
+    };
 
-	return h;
-} 
+    // Do a few final mixes of the hash to ensure the last few
+    // bytes are well-incorporated.
 
+    h ^= h >> 13;
+    h *= m;
+    h ^= h >> 15;
 
+    return h;
+}
 
-
-
-typedef struct HashNode {
-        // both NULL for empty nodes
-        char *string;
-        HashNode *next;
-    } HashNode;
-
-
+typedef struct HashNode
+{
+    // both NULL for empty nodes
+    char *string;
+    HashNode *next;
+} HashNode;
 
 static char ready;
 
@@ -144,7 +139,6 @@ int numNodes = 0;
 
 int numNewNodes = 0;
 
-
 // storage space for collisions
 // allocate them in one big block instead of separately to avoid
 // overhead from allocating them separately
@@ -152,287 +146,302 @@ static int numExtraNodes;
 static int nextUnusedExtraNode;
 static HashNode *extraNodes = NULL;
 
-
-
 // maps extended ascii to true/false of whether character is in the dictionary
 // other characters are punctuation
 static char allowedChars[256];
 
-
 // returns true on success, false on collision
-static char insertString( char *inString ) {
+static char insertString(char *inString)
+{
 
-    int key = MurmurHash2( inString, strlen( inString ), 0 ) % tableSize;
+    int key = MurmurHash2(inString, strlen(inString), 0) % tableSize;
 
-    HashNode *node = &( hashTable[ key ] );
-    
-    if( node->string == NULL ) {
+    HashNode *node = &(hashTable[key]);
+
+    if (node->string == NULL)
+    {
         // empty spot at hit
         node->string = inString;
         numNodes++;
         return true;
-        }
-    return false;
     }
-
+    return false;
+}
 
 // must allocate space in extraNodes before calling this
-static void insertCollisionStirng( char *inString ) {
+static void insertCollisionStirng(char *inString)
+{
 
-    int key = MurmurHash2( inString, strlen( inString ), 0 ) % tableSize;
+    int key = MurmurHash2(inString, strlen(inString), 0) % tableSize;
 
-    HashNode *node = &( hashTable[ key ] );
-    
-    if( node->string != NULL ) {
+    HashNode *node = &(hashTable[key]);
+
+    if (node->string != NULL)
+    {
         // full spot, as expected
 
         // walk chain
-        while( node->next != NULL ) {
+        while (node->next != NULL)
+        {
             node = node->next;
-            }
-        node->next = &( extraNodes[nextUnusedExtraNode] );
+        }
+        node->next = &(extraNodes[nextUnusedExtraNode]);
         nextUnusedExtraNode++;
         numNewNodes++;
-        
+
         node->next->string = inString;
         node->next->next = NULL;
         numNodes++;
-        }
     }
+}
 
+static char lookupString(char *inString)
+{
 
+    int key = MurmurHash2(inString, strlen(inString), 0) % tableSize;
 
-static char lookupString( char *inString ) {
-    
-    int key = MurmurHash2( inString, strlen( inString ), 0 ) % tableSize;
-        
+    HashNode *node = &(hashTable[key]);
 
-    HashNode *node = &( hashTable[ key ] );
-    
-    if( node->string == NULL ) {
+    if (node->string == NULL)
+    {
         // empty spot at hit
         return false;
-        }
-    else if( strcmp( node->string, inString ) == 0 ) {
+    }
+    else if (strcmp(node->string, inString) == 0)
+    {
         // direct hit
         return true;
-        }
-    else {
-        // full spot 
+    }
+    else
+    {
+        // full spot
 
         // walk chain
-        while( node->next != NULL ) {
+        while (node->next != NULL)
+        {
             node = node->next;
 
-            if( strcmp( node->string, inString ) == 0 ) {
+            if (strcmp(node->string, inString) == 0)
+            {
                 // hit in chain
                 return true;
-                }
             }
+        }
         // walked off end of chain
         return false;
-        }
     }
+}
 
-
-
-void initSpellCheck() {
+void initSpellCheck()
+{
     ready = false;
-    
+
     double startTime = Time::getCurrentTime();
 
-    char *dictName = 
-        SettingsManager::getStringSetting( "spellingDictionary.ini", 
-                                           "us_english_60.txt" );
-    
-    File dictFile( NULL, dictName );
-    
-    delete [] dictName;
+    char *dictName = SettingsManager::getStringSetting("spellingDictionary.ini", "us_english_60.txt");
 
+    File dictFile(NULL, dictName);
 
-    for( int i=0; i<256; i++ ) {
+    delete[] dictName;
+
+    for (int i = 0; i < 256; i++)
+    {
         allowedChars[i] = false;
-        }
-    
-    
-    if( dictFile.exists() ) {
-        allStrings = dictFile.readFileContents();
-        
-        if( allStrings != NULL ) {
+    }
 
-            int fullLen = strlen( allStrings );
-            
-            SimpleVector<char*> stringPointers;
-            
+    if (dictFile.exists())
+    {
+        allStrings = dictFile.readFileContents();
+
+        if (allStrings != NULL)
+        {
+
+            int fullLen = strlen(allStrings);
+
+            SimpleVector<char *> stringPointers;
+
             // pointer to first string
-            stringPointers.push_back( allStrings );
-            
-            
-            for( int i=0; i<fullLen; i++ ) {
-                if( allStrings[i] == '\n' ) {
+            stringPointers.push_back(allStrings);
+
+            for (int i = 0; i < fullLen; i++)
+            {
+                if (allStrings[i] == '\n')
+                {
                     allStrings[i] = '\0';
-                    
-                    if( i < fullLen - 1 ) {
-                        if( allStrings[i+1] != '\0' ) {
-                            stringPointers.push_back( &( allStrings[i+1] ) );
-                            }
+
+                    if (i < fullLen - 1)
+                    {
+                        if (allStrings[i + 1] != '\0')
+                        {
+                            stringPointers.push_back(&(allStrings[i + 1]));
                         }
                     }
-                else {
-                    allowedChars[ (unsigned char)( allStrings[i] ) ] = true;
-                    }
                 }
-        
+                else
+                {
+                    allowedChars[(unsigned char)(allStrings[i])] = true;
+                }
+            }
+
             numStrings = stringPointers.size();
 
             tableSize = numStrings;
-            hashTable = new HashNode[ tableSize ];
-            
-            for( int i=0; i<tableSize; i++ ) {
+            hashTable = new HashNode[tableSize];
+
+            for (int i = 0; i < tableSize; i++)
+            {
                 hashTable[i].string = NULL;
                 hashTable[i].next = NULL;
-                }
+            }
 
-            SimpleVector<char*> failedStrings;
-            
-            for( int i=0; i<stringPointers.size(); i++ ) {
-                char worked =
-                    insertString( stringPointers.getElementDirect( i ) );
-                
-                if( ! worked ) {
-                    failedStrings.push_back( 
-                        stringPointers.getElementDirect( i ) );
-                    }
+            SimpleVector<char *> failedStrings;
+
+            for (int i = 0; i < stringPointers.size(); i++)
+            {
+                char worked = insertString(stringPointers.getElementDirect(i));
+
+                if (!worked)
+                {
+                    failedStrings.push_back(stringPointers.getElementDirect(i));
                 }
+            }
 
             numExtraNodes = failedStrings.size();
-            extraNodes = new HashNode[ numExtraNodes ];
-            nextUnusedExtraNode = 0;            
+            extraNodes = new HashNode[numExtraNodes];
+            nextUnusedExtraNode = 0;
 
-            for( int i=0; i<failedStrings.size(); i++ ) {
-                insertCollisionStirng( failedStrings.getElementDirect( i ) );
-                }
-
-
-            printf( "Parsing dictionary file of %d words took %f ms\n",
-                    numStrings, (Time::getCurrentTime() - startTime)*1000 );
-            
-            ready = true;
+            for (int i = 0; i < failedStrings.size(); i++)
+            {
+                insertCollisionStirng(failedStrings.getElementDirect(i));
             }
+
+            printf("Parsing dictionary file of %d words took %f ms\n", numStrings,
+                   (Time::getCurrentTime() - startTime) * 1000);
+
+            ready = true;
         }
     }
+}
 
-
-
-
-
-void freeSpellCheck() {
-    if( hashTable != NULL ) {
-        delete [] hashTable;
+void freeSpellCheck()
+{
+    if (hashTable != NULL)
+    {
+        delete[] hashTable;
         hashTable = NULL;
         tableSize = 0;
-        }
+    }
 
     numNodes = 0;
 
-    if( extraNodes != NULL ) {
-        delete [] extraNodes;
+    if (extraNodes != NULL)
+    {
+        delete[] extraNodes;
         extraNodes = NULL;
-        }
-    
-    numExtraNodes = 0;
-    
+    }
 
-    if( allStrings != NULL ) {
-        delete [] allStrings;
-        }
-    
+    numExtraNodes = 0;
+
+    if (allStrings != NULL)
+    {
+        delete[] allStrings;
+    }
+
     allStrings = NULL;
     numStrings = 0;
-    
+
     ready = false;
-    }
+}
 
-
-
-char isSpellCheckReady() {
+char isSpellCheckReady()
+{
     return ready;
-    }
+}
 
-
-char checkWord( char *inWord ) {
+char checkWord(char *inWord)
+{
 
     char allAllowed = true;
-    
-    int len = strlen( inWord );
-    
-    for( int i=0; i<len; i++ ) {
-        if( ! allowedChars[ (unsigned char)( inWord[i] ) ] ) {
+
+    int len = strlen(inWord);
+
+    for (int i = 0; i < len; i++)
+    {
+        if (!allowedChars[(unsigned char)(inWord[i])])
+        {
             allAllowed = false;
             break;
-            }
         }
-    
-    if( allAllowed ) {
-        char inDict = lookupString( inWord );
+    }
 
-        if( inDict ) {
+    if (allAllowed)
+    {
+        char inDict = lookupString(inWord);
+
+        if (inDict)
+        {
             return true;
-            }
-        else if( inWord[0] >= 65 && inWord[0] <= 90 ) {
+        }
+        else if (inWord[0] >= 65 && inWord[0] <= 90)
+        {
             // upper case first letter
-            char *workingString = stringDuplicate( inWord );
-            
+            char *workingString = stringDuplicate(inWord);
+
             // try lower case
             workingString[0] += 32;
-            
-            inDict = lookupString( workingString );
-            delete [] workingString;
-            
+
+            inDict = lookupString(workingString);
+            delete[] workingString;
+
             return inDict;
-            }
-        return false;
         }
-    else {
-        char *workingString = stringDuplicate( inWord );
-        
+        return false;
+    }
+    else
+    {
+        char *workingString = stringDuplicate(inWord);
+
         // replace forbidded chars with space
-        for( int i=0; i<len; i++ ) {
-            if( ! allowedChars[ (unsigned char)( workingString[i] ) ] ) {
+        for (int i = 0; i < len; i++)
+        {
+            if (!allowedChars[(unsigned char)(workingString[i])])
+            {
                 workingString[i] = ' ';
-                }
             }
+        }
 
         // split into allowed-char runs
-        SimpleVector<char*> *tokens = tokenizeString( workingString );
-        
+        SimpleVector<char *> *tokens = tokenizeString(workingString);
+
         char inDict = true;
 
-        for( int i=0; i<tokens->size(); i++ ) {
-            char *token = tokens->getElementDirect( i );
-            
-            inDict = lookupString( token );
-            
-            if( ! inDict && token[0] >= 65 && token[0] <= 90 ) {
+        for (int i = 0; i < tokens->size(); i++)
+        {
+            char *token = tokens->getElementDirect(i);
+
+            inDict = lookupString(token);
+
+            if (!inDict && token[0] >= 65 && token[0] <= 90)
+            {
                 // upper case first letter
-                
+
                 // try lower case
                 token[0] += 32;
-            
-                inDict = lookupString( token );
-                }
-            
-            if( ! inDict ) {
-                break;
-                }
+
+                inDict = lookupString(token);
             }
+
+            if (!inDict)
+            {
+                break;
+            }
+        }
 
         tokens->deallocateStringElements();
         delete tokens;
-        
-        delete [] workingString;
+
+        delete[] workingString;
 
         return inDict;
-        }
     }
-
+}

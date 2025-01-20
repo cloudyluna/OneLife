@@ -1,19 +1,15 @@
 #ifndef EDITOR_CATEGORY_PAGE_INCLUDED
 #define EDITOR_CATEGORY_PAGE_INCLUDED
 
-
-
-
 #include "minorGems/ui/event/ActionListener.h"
 #include "minorGems/util/SimpleVector.h"
 
 #include "minorGems/game/game.h"
 
-
+#include "CheckboxButton.h"
 #include "GamePage.h"
 #include "TextButton.h"
 #include "TextField.h"
-#include "CheckboxButton.h"
 
 #include "Picker.h"
 
@@ -22,67 +18,56 @@
 
 #include "keyLegend.h"
 
-
 #define NUM_TREE_TRANS_TO_SHOW 1
 
+class EditorCategoryPage : public GamePage, public ActionListener
+{
 
+  public:
+    EditorCategoryPage();
+    ~EditorCategoryPage();
 
-class EditorCategoryPage : public GamePage, public ActionListener {
-        
-    public:
-        EditorCategoryPage();
-        ~EditorCategoryPage();
+    void clearUseOfObject(int inObjectID);
 
-        void clearUseOfObject( int inObjectID );
+    virtual void actionPerformed(GUIComponent *inTarget);
 
+    virtual void draw(doublePair inViewCenter, double inViewSize);
 
-        virtual void actionPerformed( GUIComponent *inTarget );
-        
-        virtual void draw( doublePair inViewCenter, 
-                           double inViewSize );
-        
-        virtual void step();
-  
-        virtual void makeActive( char inFresh );
-        
+    virtual void step();
 
-        virtual void pointerMove( float inX, float inY );
-        virtual void pointerDown( float inX, float inY );
-        virtual void pointerDrag( float inX, float inY );
-        virtual void pointerUp( float inX, float inY );
-        
-        virtual void keyDown( unsigned char inASCII );
-        virtual void specialKeyDown( int inKeyCode );
-        
-    protected:
-        
-        Picker mObjectParentPicker;
-        Picker mObjectChildPicker;
+    virtual void makeActive(char inFresh);
 
-        TextButton mTransEditorButton;
-        
-        CheckboxButton mIsPatternCheckbox;
-        CheckboxButton mIsProbSetCheckbox;
+    virtual void pointerMove(float inX, float inY);
+    virtual void pointerDown(float inX, float inY);
+    virtual void pointerDrag(float inX, float inY);
+    virtual void pointerUp(float inX, float inY);
 
-        TextButton mMakeUniformButton;
+    virtual void keyDown(unsigned char inASCII);
+    virtual void specialKeyDown(int inKeyCode);
 
-        int mCurrentObject;
-        
-        // if no object selected, we can pick a category and view its members
-        int mCurrentCategory;
-        
+  protected:
+    Picker mObjectParentPicker;
+    Picker mObjectChildPicker;
 
-        int mSelectionIndex;
-        int mCurrentWeightDigit;
-        
-        KeyLegend mKeyLegend;
-        KeyLegend mKeyLegendPattern;
+    TextButton mTransEditorButton;
 
+    CheckboxButton mIsPatternCheckbox;
+    CheckboxButton mIsProbSetCheckbox;
 
-        void updateCheckbox();
+    TextButton mMakeUniformButton;
 
-    };
+    int mCurrentObject;
 
+    // if no object selected, we can pick a category and view its members
+    int mCurrentCategory;
 
+    int mSelectionIndex;
+    int mCurrentWeightDigit;
+
+    KeyLegend mKeyLegend;
+    KeyLegend mKeyLegendPattern;
+
+    void updateCheckbox();
+};
 
 #endif

@@ -4,35 +4,28 @@
 #include "minorGems/game/doublePair.h"
 #include "minorGems/game/gameGraphics.h"
 
+class ClickableComponent
+{
+  public:
+    ClickableComponent();
 
+    ~ClickableComponent() {};
 
-class ClickableComponent {
-    public:
+    char mHover;
+    char mActive;
 
-        ClickableComponent( 
-            );
-        
-        ~ClickableComponent() {
-            };        
+    void pointerMove(float inX, float inY);
+    char pointerDown(float inX, float inY);
+    void setClickableArea(doublePair inTopLeft, doublePair inBottomRight);
+    void drawClickableArea();
 
-        char mHover;
-        char mActive;
+    // doublePair mTestPosition;
 
-        void pointerMove( float inX, float inY );
-        char pointerDown( float inX, float inY );
-        void setClickableArea( doublePair inTopLeft, doublePair inBottomRight );
-        void drawClickableArea();
+  protected:
+    doublePair mTopLeft;
+    doublePair mBottomRight;
 
-        // doublePair mTestPosition;
-        
-    protected:
-        doublePair mTopLeft;
-        doublePair mBottomRight;
-
-        char isInside( float inX, float inY );
-
-    };
-
+    char isInside(float inX, float inY);
+};
 
 #endif
-        

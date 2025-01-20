@@ -1,172 +1,125 @@
 #ifndef SERVER_ACTION_PAGE_INCLUDED
 #define SERVER_ACTION_PAGE_INCLUDED
 
-
 #include "GamePage.h"
 
 #include "TextButton.h"
 #include "TextField.h"
 
-
 #include "minorGems/system/Time.h"
-
-
 
 // base class for pages that execute a server action and step
 // to wait for and parse a response
 // consolidates server contact and response error-handling code
-class ServerActionPage : public GamePage {
-    public:
-        
-        // inResponsePartNames copied internally, destroyed by caller
-        ServerActionPage( const char *inServerURL,
-                          const char *inActionName,
-                          int inRequiredNumResponseParts,
-                          const char *inResponsePartNames[],
-                          char inAttachAccountHmac = true );
-        
+class ServerActionPage : public GamePage
+{
+  public:
+    // inResponsePartNames copied internally, destroyed by caller
+    ServerActionPage(const char *inServerURL, const char *inActionName, int inRequiredNumResponseParts,
+                     const char *inResponsePartNames[], char inAttachAccountHmac = true);
 
-        // for responses with a variable number of parts
-        ServerActionPage( const char *inServerURL,
-                          const char *inActionName,
-                          char inAttachAccountHmac = true );
-        
-                          
-        
-        virtual ~ServerActionPage();
-        
+    // for responses with a variable number of parts
+    ServerActionPage(const char *inServerURL, const char *inActionName, char inAttachAccountHmac = true);
 
-        void setActionName( const char *inActionName );
-        
-        
-        // clears old response part names
-        // if inRequiredNumResponseParts is -1 
-        // (and inResponsePartNames is NULL)
-        // then response will be allowed to have a variable number of parts
-        void setResponsePartNames( int inRequiredNumResponseParts,
-                                   const char *inResponsePartNames[] );
-        
+    virtual ~ServerActionPage();
 
+    void setActionName(const char *inActionName);
 
-        void setActionParameter( const char *inParameterName,
-                                 const char *inParameterValue );
-        
-        void setActionParameter( const char *inParameterName,
-                                 int inParameterValue );
+    // clears old response part names
+    // if inRequiredNumResponseParts is -1
+    // (and inResponsePartNames is NULL)
+    // then response will be allowed to have a variable number of parts
+    void setResponsePartNames(int inRequiredNumResponseParts, const char *inResponsePartNames[]);
 
-        void setActionParameter( const char *inParameterName,
-                                 double inParameterValue );
-        
-        
-        void clearActionParameters();
-        
+    void setActionParameter(const char *inParameterName, const char *inParameterValue);
 
-        // defaults to true
-        void setAttachAccountHmac( char inShouldAttach );
+    void setActionParameter(const char *inParameterName, int inParameterValue);
 
+    void setActionParameter(const char *inParameterName, double inParameterValue);
 
-        // beyond DENIED, which is built-in and maps to key requestDenied, 
-        // adds other error strings to be handled specially
-        void addServerErrorString( const char *inServerErrorString,
-                                   const char *inUserMessageKey );        
+    void clearActionParameters();
 
-        // for more complicated error handling beyond displaying
-        // a message on this page, can also set a named signal
-        void addServerErrorStringSignal( const char *inServerErrorString,
-                                         const char *inSignalToSet );
+    // defaults to true
+    void setAttachAccountHmac(char inShouldAttach);
 
+    // beyond DENIED, which is built-in and maps to key requestDenied,
+    // adds other error strings to be handled specially
+    void addServerErrorString(const char *inServerErrorString, const char *inUserMessageKey);
 
-        // default behavior is to start request immediately upon
-        // makeActive (this is great for single-action pages)
-        // override makeActive to change this behavior
-        virtual void makeActive( char inFresh );
+    // for more complicated error handling beyond displaying
+    // a message on this page, can also set a named signal
+    void addServerErrorStringSignal(const char *inServerErrorString, const char *inSignalToSet);
 
-        virtual void step();
-        
+    // default behavior is to start request immediately upon
+    // makeActive (this is great for single-action pages)
+    // override makeActive to change this behavior
+    virtual void makeActive(char inFresh);
 
+    virtual void step();
 
-        char isError();
+    char isError();
 
-        char isResponseReady();
-        
-        char isActionInProgress();
-        
+    char isResponseReady();
 
-        // result destroyed by caller
-        char *getResponse( const char *inPartName );
-        
-        int getResponseInt( const char *inPartName );
-        
-        double getResponseDouble( const char *inPartName );
-        
-        
-        // for variable-length response lists
-        int getNumResponseParts();
-        
-        char *getResponse( int inPartNumber );
+    char isActionInProgress();
 
+    // result destroyed by caller
+    char *getResponse(const char *inPartName);
 
-        
-        // defaults to 0
-        // sets minimum time before response from server is processed
-        // and flagged with isResponseReady
-        // (To allow user to read messages during server action, like
-        //  "Logging in...")
-        void setMinimumResponseTime( unsigned int inSeconds );
+    int getResponseInt(const char *inPartName);
 
+    double getResponseDouble(const char *inPartName);
 
-        // call this before adding hmac-signed parameters below
-        void setupRequestParameterSecurity();
-        
-        
-        // for two-parameter, hmac-signed parameters
-        void setParametersFromField( const char *inParamName,
-                                     TextField *inField );
-        
-        void setParametersFromString( const char *inParamName,
-                                      const char *inString );
+    // for variable-length response lists
+    int getNumResponseParts();
 
-    protected:
-        
-        void startRequest();
+    char *getResponse(int inPartNumber);
 
-        
-        char *mServerURL;
-        char *mActionName;
+    // defaults to 0
+    // sets minimum time before response from server is processed
+    // and flagged with isResponseReady
+    // (To allow user to read messages during server action, like
+    //  "Logging in...")
+    void setMinimumResponseTime(unsigned int inSeconds);
 
-        SimpleVector<char*> mActionParameterNames;
-        SimpleVector<char*> mActionParameterValues;
-        
-        char mAttachAccountHmac;
+    // call this before adding hmac-signed parameters below
+    void setupRequestParameterSecurity();
 
-        SimpleVector<char *> mErrorStringList;
-        SimpleVector<const char *> mErrorStringUserMessageKeys;
+    // for two-parameter, hmac-signed parameters
+    void setParametersFromField(const char *inParamName, TextField *inField);
 
-        SimpleVector<char *> mErrorStringListForSignals;
-        SimpleVector<const char *> mErrorStringSignals;
-        
+    void setParametersFromString(const char *inParamName, const char *inString);
 
-        int mNumResponseParts;
-        
-        SimpleVector<char*> mResponsePartNames;
-        SimpleVector<char*> mResponseParts;
-        
+  protected:
+    void startRequest();
 
-        int mWebRequest;
-        char mResponseReady;
+    char *mServerURL;
+    char *mActionName;
 
+    SimpleVector<char *> mActionParameterNames;
+    SimpleVector<char *> mActionParameterValues;
 
-        int mMinimumResponseSeconds;
-        
-        timeSec_t mRequestStartTime;
+    char mAttachAccountHmac;
 
+    SimpleVector<char *> mErrorStringList;
+    SimpleVector<const char *> mErrorStringUserMessageKeys;
 
-        char *mParameterHmacKey;
-        
+    SimpleVector<char *> mErrorStringListForSignals;
+    SimpleVector<const char *> mErrorStringSignals;
 
+    int mNumResponseParts;
 
-    };
+    SimpleVector<char *> mResponsePartNames;
+    SimpleVector<char *> mResponseParts;
 
-        
+    int mWebRequest;
+    char mResponseReady;
+
+    int mMinimumResponseSeconds;
+
+    timeSec_t mRequestStartTime;
+
+    char *mParameterHmacKey;
+};
 
 #endif

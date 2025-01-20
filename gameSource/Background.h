@@ -1,38 +1,30 @@
 #ifndef BACKGROUND_INCLUDED
 #define BACKGROUND_INCLUDED
 
-
 #include "PageComponent.h"
 
 #include "minorGems/game/gameGraphics.h"
 #include "minorGems/ui/event/ActionListenerList.h"
 
+class Background : public PageComponent, public ActionListenerList
+{
 
-class Background : public PageComponent, public ActionListenerList {
-        
-    public:
+  public:
+    Background(const char *inImageName, float inOpacity = 1.0f, doublePair inPosition = {0, 0});
 
-        Background( const char *inImageName, float inOpacity = 1.0f, doublePair inPosition = {0, 0} );
-        
-        
-        virtual void setImage( const char *inImageName ) {
-            mImage = loadSprite( inImageName, false );
-            }
-        
-        
-        
-        virtual void draw();
-        
+    virtual void setImage(const char *inImageName)
+    {
+        mImage = loadSprite(inImageName, false);
+    }
 
-        
-    protected:
-        SpriteHandle mImage;
+    virtual void draw();
 
-        float mOpacity;
+  protected:
+    SpriteHandle mImage;
 
-        doublePair mPosition;
-        
-    };
+    float mOpacity;
 
+    doublePair mPosition;
+};
 
 #endif

@@ -1,7 +1,6 @@
 #ifndef SOUND_WIDGET_INCLUDED
 #define SOUND_WIDGET_INCLUDED
 
-
 #include "SpriteButton.h"
 #include "TextButton.h"
 #include "ValueSlider.h"
@@ -10,85 +9,66 @@
 
 #include "SoundUsage.h"
 
-
 // action fired when sound or volume changes internally
-class SoundWidget : public PageComponent, public ActionListenerList,
-                    public ActionListener {
-        
-    public:
-        
-        SoundWidget( Font *inDisplayFont, int inX, int inY );
-        
+class SoundWidget : public PageComponent, public ActionListenerList, public ActionListener
+{
 
-        ~SoundWidget();
-        
-        static void clearClipboard();
-        
-        
-        // returns internal copy
-        // not deallocated by caller
-        // returns blankSoundUsage during recording
-        SoundUsage getSoundUsage();
+  public:
+    SoundWidget(Font *inDisplayFont, int inX, int inY);
 
-        // copies internally
-        void setSoundUsage( SoundUsage inUsage );
+    ~SoundWidget();
 
-        char isRecording();
-        
-    protected:
+    static void clearClipboard();
 
-        SoundUsage mSoundUsage;
-        
-        // subsound index in Usage
-        // if == numSubSounds, then we are recording a new subsount
-        int mCurSoundIndex;
-        
+    // returns internal copy
+    // not deallocated by caller
+    // returns blankSoundUsage during recording
+    SoundUsage getSoundUsage();
 
-        void setSoundInternal( SoundUsage inUsage );
+    // copies internally
+    void setSoundUsage(SoundUsage inUsage);
 
-        
-        static SoundUsage sClipboardSoundUsage;
-        
-        // for propagating clipboard changes
-        static SimpleVector<SoundWidget*> sWidgetList;
+    char isRecording();
 
-        TextButton mPrevSubSoundButton;
-        TextButton mNextSubSoundButton;
-        TextButton mRemoveSubSoundButton;
-        
-        
-        SpriteButton mRecordButton;
-        SpriteButton mStopButton;
-        SpriteButton mPlayButton;
-        
+  protected:
+    SoundUsage mSoundUsage;
 
-        SpriteButton mPlayRandButton;
-        SpriteButton mClearButton;
-        
-        SpriteButton mCopyButton;
-        SpriteButton mPasteButton;
-        
+    // subsound index in Usage
+    // if == numSubSounds, then we are recording a new subsount
+    int mCurSoundIndex;
 
-        ValueSlider mVolumeSlider;
-        
-        TextButton mDefaultVolumeButton;
+    void setSoundInternal(SoundUsage inUsage);
 
-        
-        virtual void actionPerformed( GUIComponent *inTarget );
+    static SoundUsage sClipboardSoundUsage;
 
+    // for propagating clipboard changes
+    static SimpleVector<SoundWidget *> sWidgetList;
 
-        virtual void draw();
-        
-                
-        void updatePasteButton();
+    TextButton mPrevSubSoundButton;
+    TextButton mNextSubSoundButton;
+    TextButton mRemoveSubSoundButton;
 
+    SpriteButton mRecordButton;
+    SpriteButton mStopButton;
+    SpriteButton mPlayButton;
 
-        void nextPrevVisible();
-        
+    SpriteButton mPlayRandButton;
+    SpriteButton mClearButton;
 
-    };
+    SpriteButton mCopyButton;
+    SpriteButton mPasteButton;
 
-    
+    ValueSlider mVolumeSlider;
 
+    TextButton mDefaultVolumeButton;
+
+    virtual void actionPerformed(GUIComponent *inTarget);
+
+    virtual void draw();
+
+    void updatePasteButton();
+
+    void nextPrevVisible();
+};
 
 #endif

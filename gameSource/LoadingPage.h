@@ -2,34 +2,29 @@
 
 #include "minorGems/ui/event/ActionListener.h"
 
+class LoadingPage : public GamePage
+{
 
-class LoadingPage : public GamePage {
-        
-    public:
-        
+  public:
+    LoadingPage() : mShowProgress(true)
+    {
+    }
 
-        LoadingPage() 
-                : mShowProgress( true ) {
-            }
-        
+    void setCurrentPhase(const char *inPhaseName);
 
-        void setCurrentPhase( const char *inPhaseName );
-        
-        void setCurrentProgress( float inProgress );
-        
-        // on by default
-        void showProgress( char inShow ) {
-            mShowProgress = inShow;
-            }
-        
+    void setCurrentProgress(float inProgress);
 
-        virtual void draw( doublePair inViewCenter, 
-                           double inViewSize );
-        
+    // on by default
+    void showProgress(char inShow)
+    {
+        mShowProgress = inShow;
+    }
 
-    private:
-        const char *mPhaseName;
-        float mProgress;
+    virtual void draw(doublePair inViewCenter, double inViewSize);
 
-        char mShowProgress;
-    };
+  private:
+    const char *mPhaseName;
+    float mProgress;
+
+    char mShowProgress;
+};

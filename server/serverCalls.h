@@ -1,7 +1,5 @@
 
 
+GridPos killPlayer(const char *inEmail);
 
-GridPos killPlayer( const char *inEmail );
-
-
-void forcePlayerAge( const char *inEmail, double inAge );
+void forcePlayerAge(const char *inEmail, double inAge);

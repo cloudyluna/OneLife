@@ -1,7 +1,6 @@
 #include "../gameSource/GridPos.h"
 #include "../gameSource/objectBank.h"
 
-
 // client-issued server-side triggers
 
 // NOTE:
@@ -15,25 +14,21 @@ void freeTriggers();
 
 char areTriggersEnabled();
 
-
 // returns -1 if unknown
-int getTriggerPlayerDisplayID( const char *inPlayerEmail );
+int getTriggerPlayerDisplayID(const char *inPlayerEmail);
 
-double getTriggerPlayerAge( const char *inPlayerEmail );
+double getTriggerPlayerAge(const char *inPlayerEmail);
 
-GridPos getTriggerPlayerPos( const char *inPlayerEmail );
+GridPos getTriggerPlayerPos(const char *inPlayerEmail);
 
 // only supports a single held id, and not containment
-int getTriggerPlayerHolding( const char *inPlayerEmail );
+int getTriggerPlayerHolding(const char *inPlayerEmail);
 
-ClothingSet getTriggerPlayerClothing( const char *inPlayerEmail );
+ClothingSet getTriggerPlayerClothing(const char *inPlayerEmail);
 
-
-
-void trigger( int inTriggerNumber );
+void trigger(int inTriggerNumber);
 
 void stepTriggers();
-
 
 // amount of time that it's safe to wait before calling stepTriggers()
 // returns -1.0 if there are no pending triggers

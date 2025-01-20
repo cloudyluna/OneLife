@@ -1,7 +1,7 @@
-#include "minorGems/system/Time.h"
-#include "minorGems/util/SimpleVector.h"
-#include "minorGems/util/SettingsManager.h"
 #include "minorGems/io/file/File.h"
+#include "minorGems/system/Time.h"
+#include "minorGems/util/SettingsManager.h"
+#include "minorGems/util/SimpleVector.h"
 #include "minorGems/util/log/AppLog.h"
 
 #include "../gameSource/objectBank.h"
@@ -12,15 +12,14 @@
 
 static double lastCheckTime = 0;
 
-void initObjectSurvey() {
+void initObjectSurvey()
+{
     lastCheckTime = Time::getCurrentTime();
-    }
+}
 
-
-
-void freeObjectSurvey() {
-    }
-
+void freeObjectSurvey()
+{
+}
 
 static char surveyRunning = false;
 
@@ -28,270 +27,261 @@ static SimpleVector<GridPos> playerPosToCheck;
 
 static int nextPlayerPosToCheck = 0;
 
-
 static SimpleVector<GridPos> finalPlayerPos;
 
 static int nextFinalPosToAdd = 0;
 
-
 static SimpleVector<GridPos> mapPosToCheck;
-
 
 static int mapPosBatch = 100;
 
-
 static int playerBoxRadius = 10;
 
-
-typedef struct SurveyRecord {
-        int id;
-        int count;
-    } SurveyRecord;
-
+typedef struct SurveyRecord
+{
+    int id;
+    int count;
+} SurveyRecord;
 
 static SimpleVector<SurveyRecord> objectSurveyRecords;
 
+static SurveyRecord *findRecord(int inID)
+{
+    for (int i = 0; i < objectSurveyRecords.size(); i++)
+    {
 
-static SurveyRecord *findRecord( int inID ) {
-    for( int i=0; i<objectSurveyRecords.size(); i++ ) {
-        
-        SurveyRecord *r = objectSurveyRecords.getElement( i );
-        
-        if( r->id == inID ) {
+        SurveyRecord *r = objectSurveyRecords.getElement(i);
+
+        if (r->id == inID)
+        {
             return r;
-            }
         }
-    return NULL;
     }
+    return NULL;
+}
 
-    
+void stepObjectSurvey()
+{
+    if (surveyRunning)
+    {
 
-
-void stepObjectSurvey() {
-    if( surveyRunning ) {
-        
-        if( nextPlayerPosToCheck < playerPosToCheck.size() ) {
+        if (nextPlayerPosToCheck < playerPosToCheck.size())
+        {
             // run one step of checking player pos against final list
             // on 200 player server, this will take 200 server steps
             // (spread work out)
-            GridPos pos = 
-                playerPosToCheck.getElementDirect( nextPlayerPosToCheck );
-            
-            nextPlayerPosToCheck ++;
-            
+            GridPos pos = playerPosToCheck.getElementDirect(nextPlayerPosToCheck);
+
+            nextPlayerPosToCheck++;
+
             char tooClose = false;
-            
-            for( int p=0; p<finalPlayerPos.size(); p++ ) {
-                GridPos thisPos = finalPlayerPos.getElementDirect( p );
-                
-                if( abs( pos.x - thisPos.x ) <= playerBoxRadius &&
-                    abs( pos.y - thisPos.y ) <= playerBoxRadius ) {
-                    
+
+            for (int p = 0; p < finalPlayerPos.size(); p++)
+            {
+                GridPos thisPos = finalPlayerPos.getElementDirect(p);
+
+                if (abs(pos.x - thisPos.x) <= playerBoxRadius && abs(pos.y - thisPos.y) <= playerBoxRadius)
+                {
+
                     tooClose = true;
                     break;
-                    }
                 }
-
-            if( ! tooClose ) {
-                finalPlayerPos.push_back( pos );
-                }
-            
-            if( nextPlayerPosToCheck == playerPosToCheck.size() ) {
-                AppLog::infoF( 
-                    "Final object survey list of %d player positions ready",
-                    finalPlayerPos.size() );
-                }
-            
-            return;
             }
+
+            if (!tooClose)
+            {
+                finalPlayerPos.push_back(pos);
+            }
+
+            if (nextPlayerPosToCheck == playerPosToCheck.size())
+            {
+                AppLog::infoF("Final object survey list of %d player positions ready", finalPlayerPos.size());
+            }
+
+            return;
+        }
 
         // else final list ready
 
-        
-        
-        if( nextFinalPosToAdd < finalPlayerPos.size() ) {
+        if (nextFinalPosToAdd < finalPlayerPos.size())
+        {
             // add all map pos in box radius around player
-            GridPos pos = 
-                finalPlayerPos.getElementDirect( nextFinalPosToAdd );
-            
-            nextFinalPosToAdd ++;
+            GridPos pos = finalPlayerPos.getElementDirect(nextFinalPosToAdd);
 
-            for( int y=-playerBoxRadius; y<=playerBoxRadius; y++ ) {
-                for( int x=-playerBoxRadius; x<=playerBoxRadius; x++ ) {
+            nextFinalPosToAdd++;
+
+            for (int y = -playerBoxRadius; y <= playerBoxRadius; y++)
+            {
+                for (int x = -playerBoxRadius; x <= playerBoxRadius; x++)
+                {
                     GridPos boxPos = pos;
                     boxPos.x += x;
                     boxPos.y += y;
-                    
-                    mapPosToCheck.push_back( boxPos );
-                    }
+
+                    mapPosToCheck.push_back(boxPos);
                 }
-            
-            if( nextFinalPosToAdd == finalPlayerPos.size() ) {
-                AppLog::infoF( 
-                    "Final object survey list of %d map positions ready",
-                    mapPosToCheck.size() );
-                }
-            
-            
-            return;
             }
 
-        
+            if (nextFinalPosToAdd == finalPlayerPos.size())
+            {
+                AppLog::infoF("Final object survey list of %d map positions ready", mapPosToCheck.size());
+            }
+
+            return;
+        }
+
         int numMapPosLeft = mapPosToCheck.size();
-        if( numMapPosLeft > 0 ) {
-            
+        if (numMapPosLeft > 0)
+        {
 
             int thisBatchSize = mapPosBatch;
-            
-            if( thisBatchSize > numMapPosLeft ) {
-                thisBatchSize = numMapPosLeft;
-                }
-            
-            for( int i=0; i<thisBatchSize; i++ ) {
-                
-                GridPos pos = 
-                    mapPosToCheck.getElementDirect( numMapPosLeft - 1 );
 
-                mapPosToCheck.deleteElement( numMapPosLeft - 1 );
+            if (thisBatchSize > numMapPosLeft)
+            {
+                thisBatchSize = numMapPosLeft;
+            }
+
+            for (int i = 0; i < thisBatchSize; i++)
+            {
+
+                GridPos pos = mapPosToCheck.getElementDirect(numMapPosLeft - 1);
+
+                mapPosToCheck.deleteElement(numMapPosLeft - 1);
 
                 numMapPosLeft--;
-                
 
-                int id = getMapObject( pos.x, pos.y );
-                
+                int id = getMapObject(pos.x, pos.y);
 
-                if( id > 0 ) {    
-                    SurveyRecord *r = findRecord( id );
-                    if( r != NULL ) {
-                        r->count ++;
-                        }
-                    else {
-                        SurveyRecord newRec = { id, 1 };
-                        objectSurveyRecords.push_back( newRec );
-                        }
+                if (id > 0)
+                {
+                    SurveyRecord *r = findRecord(id);
+                    if (r != NULL)
+                    {
+                        r->count++;
+                    }
+                    else
+                    {
+                        SurveyRecord newRec = {id, 1};
+                        objectSurveyRecords.push_back(newRec);
                     }
                 }
-            return;
             }
-
+            return;
+        }
 
         // else totally done, print report
-        
+
         surveyRunning = false;
-        
 
-        AppLog::infoF( 
-            "Saving object survey report for %d unique objects",
-            objectSurveyRecords.size() );
+        AppLog::infoF("Saving object survey report for %d unique objects", objectSurveyRecords.size());
 
-        
-        File logDir( NULL, "objectSurveys" );
-    
-        if( ! logDir.exists() ) {
-            Directory::makeDirectory( &logDir );
-            }
+        File logDir(NULL, "objectSurveys");
 
-        if( ! logDir.isDirectory() ) {
-            AppLog::error( "Non-directory objectSurveys is in the way" );
+        if (!logDir.exists())
+        {
+            Directory::makeDirectory(&logDir);
+        }
+
+        if (!logDir.isDirectory())
+        {
+            AppLog::error("Non-directory objectSurveys is in the way");
             return;
-            }
+        }
 
         int nextSurveyID = 1;
-        
-        int numFiles = 0;
-        File **childFiles = logDir.getChildFiles( &numFiles );
-        
-        if( numFiles > 0 ) {
-            for( int i=0; i<numFiles; i++ ) {
-                char *name = childFiles[i]->getFileName();
-                
-                int thisNum = 0;
-                sscanf( name, "survey%d.txt", &thisNum );
-                
-                if( thisNum >= nextSurveyID ) {
-                    nextSurveyID = thisNum + 1;
-                    }
 
-                delete [] name;
-                delete childFiles[i];
+        int numFiles = 0;
+        File **childFiles = logDir.getChildFiles(&numFiles);
+
+        if (numFiles > 0)
+        {
+            for (int i = 0; i < numFiles; i++)
+            {
+                char *name = childFiles[i]->getFileName();
+
+                int thisNum = 0;
+                sscanf(name, "survey%d.txt", &thisNum);
+
+                if (thisNum >= nextSurveyID)
+                {
+                    nextSurveyID = thisNum + 1;
                 }
+
+                delete[] name;
+                delete childFiles[i];
             }
-        delete [] childFiles;
-        
-        char *thisFileName = autoSprintf( "survey%d.txt", nextSurveyID );
-        
-        File *thisFile = logDir.getChildFile( thisFileName );
-        
+        }
+        delete[] childFiles;
+
+        char *thisFileName = autoSprintf("survey%d.txt", nextSurveyID);
+
+        File *thisFile = logDir.getChildFile(thisFileName);
+
         char *thisFilePath = thisFile->getFullFileName();
-        
-        delete [] thisFileName;
+
+        delete[] thisFileName;
         delete thisFile;
-        
+
         // easy enough to sort with other tools externally
         // just print the counts and IDs and names
 
-        FILE *f = fopen( thisFilePath, "w" );
+        FILE *f = fopen(thisFilePath, "w");
 
-        AppLog::infoF( 
-            "Saving object survey report into file %s", thisFilePath );
+        AppLog::infoF("Saving object survey report into file %s", thisFilePath);
 
-        
-        if( f != NULL ) {
-            
-            for( int i=0; i<objectSurveyRecords.size(); i++ ) {
-                SurveyRecord *r = objectSurveyRecords.getElement( i );
-                
-                fprintf( f, "%d [%d] %s\n",
-                         r->count, r->id, getObject( r->id )->description );
-                }
-            fclose( f );
+        if (f != NULL)
+        {
+
+            for (int i = 0; i < objectSurveyRecords.size(); i++)
+            {
+                SurveyRecord *r = objectSurveyRecords.getElement(i);
+
+                fprintf(f, "%d [%d] %s\n", r->count, r->id, getObject(r->id)->description);
             }
-        else {
-            AppLog::errorF( "Failed to open %s for writing", thisFilePath );
-            }
-        delete [] thisFilePath;
-        
+            fclose(f);
         }
+        else
+        {
+            AppLog::errorF("Failed to open %s for writing", thisFilePath);
+        }
+        delete[] thisFilePath;
     }
+}
 
-
-
-
-
-char shouldRunObjectSurvey() {
+char shouldRunObjectSurvey()
+{
 
     double curTime = Time::getCurrentTime();
-    
-    if( curTime > lastCheckTime + 10 ) {
+
+    if (curTime > lastCheckTime + 10)
+    {
         lastCheckTime = curTime;
-        
+
         char run = false;
-        if( SettingsManager::getIntSetting( "runObjectSurveyNow", 0 ) ) {
+        if (SettingsManager::getIntSetting("runObjectSurveyNow", 0))
+        {
             run = true;
 
-            SettingsManager::setSetting( "runObjectSurveyNow", 0 );
-            }
-        return run;
+            SettingsManager::setSetting("runObjectSurveyNow", 0);
         }
-    return false;
+        return run;
     }
+    return false;
+}
 
+void startObjectSurvey(SimpleVector<GridPos> *inLivingPlayerPositions)
+{
+    AppLog::infoF("Starting object survey around %d players", inLivingPlayerPositions->size());
 
-
-void startObjectSurvey( SimpleVector<GridPos> *inLivingPlayerPositions ) {
-    AppLog::infoF( "Starting object survey around %d players",
-                   inLivingPlayerPositions->size() );
-    
     surveyRunning = true;
-    
+
     playerPosToCheck.deleteAll();
     finalPlayerPos.deleteAll();
     mapPosToCheck.deleteAll();
 
     objectSurveyRecords.deleteAll();
-    
-    playerPosToCheck.push_back_other( inLivingPlayerPositions );
+
+    playerPosToCheck.push_back_other(inLivingPlayerPositions);
     nextPlayerPosToCheck = 0;
     nextFinalPosToAdd = 0;
-    }
-
+}

@@ -9,82 +9,69 @@
 
 #include "buttonStyle.h"
 
-
 extern Font *mainFont;
 
+FinalMessagePage::FinalMessagePage() : mKey(""), mSubMessage(NULL), mQuitButton(mainFont, 0, -300, translate("quit"))
+{
 
+    setButtonStyle(&mQuitButton);
+    addComponent(&mQuitButton);
 
-FinalMessagePage::FinalMessagePage()
-        : mKey( "" ), mSubMessage( NULL ),
-          mQuitButton( mainFont, 0, -300, 
-                       translate( "quit" ) ) {
+    mQuitButton.addActionListener(this);
+}
 
+FinalMessagePage::~FinalMessagePage()
+{
+    setSubMessage(NULL);
+}
 
-    setButtonStyle( &mQuitButton );
-    addComponent( &mQuitButton );
-    
-    mQuitButton.addActionListener( this );
+void FinalMessagePage::actionPerformed(GUIComponent *inTarget)
+{
+    if (inTarget == &mQuitButton)
+    {
+        setSignal("quit");
     }
+}
 
-
-
-FinalMessagePage::~FinalMessagePage() {
-    setSubMessage( NULL );
-    }
-
-
-
-void FinalMessagePage::actionPerformed( GUIComponent *inTarget ) {
-    if( inTarget == &mQuitButton ) {
-        setSignal( "quit" );
-        }
-    }
-
-
-
-
-void FinalMessagePage::setMessageKey( const char *inKey ) {
+void FinalMessagePage::setMessageKey(const char *inKey)
+{
     mKey = inKey;
-    }
+}
 
-
-
-void FinalMessagePage::setSubMessage( const char *inSubMessage ) {
-    if( mSubMessage != NULL ) {
-        delete [] mSubMessage;
+void FinalMessagePage::setSubMessage(const char *inSubMessage)
+{
+    if (mSubMessage != NULL)
+    {
+        delete[] mSubMessage;
         mSubMessage = NULL;
-        }
-    if( inSubMessage != NULL ) {
-        mSubMessage = stringDuplicate( inSubMessage );
-        }
     }
+    if (inSubMessage != NULL)
+    {
+        mSubMessage = stringDuplicate(inSubMessage);
+    }
+}
 
-
-
-
-void FinalMessagePage::makeActive( char inFresh ) {
-    if( !inFresh ) {
+void FinalMessagePage::makeActive(char inFresh)
+{
+    if (!inFresh)
+    {
         return;
-        }
-    
-    setWaiting( false );
     }
 
+    setWaiting(false);
+}
 
-void FinalMessagePage::draw( doublePair inViewCenter, 
-                              double inViewSize ) {
+void FinalMessagePage::draw(doublePair inViewCenter, double inViewSize)
+{
 
-    doublePair labelPos = { 0, 100 };
+    doublePair labelPos = {0, 100};
 
-    
-    drawMessage( translate( mKey ), labelPos, false );
+    drawMessage(translate(mKey), labelPos, false);
 
-    if( mSubMessage != NULL ) {    
+    if (mSubMessage != NULL)
+    {
         labelPos.y -= 200;
-        
-        drawMessage( mSubMessage, labelPos, false );
-        }
-    
+
+        drawMessage(mSubMessage, labelPos, false);
     }
-
-
+}

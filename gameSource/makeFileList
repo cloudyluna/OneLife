@@ -28,6 +28,7 @@ serialWebRequests.cpp \
 accountHmac.cpp \
 PageComponent.cpp \
 GamePage.cpp \
+LivingLifePage/ChatLogPanel.cpp \
 LivingLifePage.cpp \
 pathFind.cpp \
 ageControl.cpp \

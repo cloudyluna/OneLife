@@ -1,27 +1,28 @@
-#include <cstdio>
 #include <cassert>
-#include <cstring>
 #include <climits>
+#include <cstdio>
+#include <cstring>
 #include <ctime>
 
 #include "minorGems/util/SettingsManager.h"
 #include "minorGems/util/stringUtils.h"
 
-#include "objectBank.h"
-#include "LivingLifePage.h"
 #include "DiscordController.h"
+#include "LivingLifePage.h"
 #include "emotion.h"
+#include "objectBank.h"
 
 #include <time.h>
 
 // #define DISCORD_DEBUGGING // please disable when publishing, fflush() in VERBOSE will slow the execution
 #ifdef DISCORD_DEBUGGING
 // print verbose info to stdout then flush it. used for debugging
-#define VERBOSE(fmt, ...)                                \
-    printf("[VERBOSE] " fmt __VA_OPT__(, ) __VA_ARGS__); \
+#define VERBOSE(fmt, ...)                                                                                              \
+    printf("[VERBOSE] " fmt __VA_OPT__(, ) __VA_ARGS__);                                                               \
     fflush(stdout)
 #else
-// Verbose is currently disabled(this whole instruction will be empty string) enable it by uncommenting DISCORD_DEBUGGING definition above or add -DDISCORD_DEBUGGING to the compiler flags
+// Verbose is currently disabled(this whole instruction will be empty string) enable it by uncommenting
+// DISCORD_DEBUGGING definition above or add -DDISCORD_DEBUGGING to the compiler flags
 #define VERBOSE(fmt, ...)
 #endif
 
@@ -45,7 +46,8 @@ int reconnectAttemptDelaySeconds = 10;
 // last time we changed the activity data.
 time_t lastStateSetAt = 0;
 
-// we consider player is idle if his state did not change after this amount of seconds(excluding livingLife, it will check the afk emote).
+// we consider player is idle if his state did not change after this amount of seconds(excluding livingLife, it will
+// check the afk emote).
 time_t idleTime = 60 * 2;
 
 // the last reported name size to the discord app
@@ -104,7 +106,9 @@ DiscordController::DiscordController()
     dDisplayStatus = SettingsManager::getIntSetting("discordRichPresenceStatus", 0) > 0;
     dDisplayDetails = SettingsManager::getIntSetting("discordRichPresenceDetails", 0) > 0;
     dDisplayFirstName = SettingsManager::getIntSetting("discordRichPresenceHideFirstName", 1) <= 0;
-    dDisplayAge = SettingsManager::getIntSetting("discordRichPresenceShowAge", 1) > 0; // This setting is only changed via the .ini file, Setting page does not change it(too many options already).
+    dDisplayAge =
+        SettingsManager::getIntSetting("discordRichPresenceShowAge", 1) >
+        0; // This setting is only changed via the .ini file, Setting page does not change it(too many options already).
 
     printf("discord: discordRichPresence.ini=%d\n", dDisplayGame);
     printf("discord: discordRichPresenceStatus.ini=%d\n", dDisplayStatus);
@@ -133,7 +137,9 @@ EDiscordResult DiscordController::connect()
     }
     if (!dDisplayGame)
     {
-        printf("discord warning connect(): setting dDisplayGame is false(discordRichPresence.ini=0), will not attempt to connect, we will return %d to our caller\n", EDiscordResult::DiscordResult_ApplicationMismatch);
+        printf("discord warning connect(): setting dDisplayGame is false(discordRichPresence.ini=0), will not attempt "
+               "to connect, we will return %d to our caller\n",
+               EDiscordResult::DiscordResult_ApplicationMismatch);
         return EDiscordResult::DiscordResult_ApplicationMismatch;
     }
     struct IDiscordActivityEvents activities_events;
@@ -152,7 +158,8 @@ EDiscordResult DiscordController::connect()
     {
         VERBOSE("discord_client_id key was not fully read from string, key is probably invalid\n");
         invalidKey = true;
-        // return EDiscordResult::DiscordResult_InvalidSecret; // <--- let it try one time only, if it succeeds in updating activity it will be set to false in the update activity callback
+        // return EDiscordResult::DiscordResult_InvalidSecret; // <--- let it try one time only, if it succeeds in
+        // updating activity it will be set to false in the update activity callback
     }
     delete[] discord_client_id;
     // delete[] endptr;
@@ -183,7 +190,9 @@ EDiscordResult DiscordController::connect()
     strncpy(mActivity.assets.large_image, gameLargeIcon, sizeof(mActivity.assets.large_image));
     delete[] gameLargeIcon;
 
-    char *gameShortDescrtiption = SettingsManager::getStringSetting("discordGameShortDescription", "A multiplayer survival game of parenting and civilization building, Join us on discord to play!");
+    char *gameShortDescrtiption = SettingsManager::getStringSetting(
+        "discordGameShortDescription",
+        "A multiplayer survival game of parenting and civilization building, Join us on discord to play!");
     strncpy(mActivity.assets.large_text, gameShortDescrtiption, sizeof(mActivity.assets.large_text));
     delete[] gameShortDescrtiption;
 
@@ -196,7 +205,9 @@ EDiscordResult DiscordController::connect()
     {
         if (result == EDiscordResult::DiscordResult_NotRunning)
         {
-            printf("discord error connect(): first attempt to run_callbacks() failed because discord client is not running, we may attempt connecting again after %d seconds\n", reconnectAttemptDelaySeconds);
+            printf("discord error connect(): first attempt to run_callbacks() failed because discord client is not "
+                   "running, we may attempt connecting again after %d seconds\n",
+                   reconnectAttemptDelaySeconds);
         }
         else
         {
@@ -221,7 +232,8 @@ void DiscordController::updateActivity(ActivityType activity_type, const char *d
     VERBOSE("DiscordController::updateActivity(%d, %s, %s) was called\n", activity_type, details, state);
     if (!dDisplayGame)
     {
-        VERBOSE("DiscordController::updateActivity(%d, %s, %s) early return because dDisplayGame is false\n", activity_type, details, state);
+        VERBOSE("DiscordController::updateActivity(%d, %s, %s) early return because dDisplayGame is false\n",
+                activity_type, details, state);
         return;
     }
 
@@ -250,7 +262,9 @@ void DiscordController::updateActivity(ActivityType activity_type, const char *d
     {
         if (!dDisplayDetails)
         {
-            VERBOSE("DiscordController::updateActivity(%d, %s, %s) details will be masked because dDisplayDetails is false\n", activity_type, details, state);
+            VERBOSE("DiscordController::updateActivity(%d, %s, %s) details will be masked because dDisplayDetails is "
+                    "false\n",
+                    activity_type, details, state);
             strncpy(mActivity.state, "", sizeof(mActivity.details));
         }
         else
@@ -327,13 +341,18 @@ void DiscordController::runCallbacks()
         }
         return;
     }
-    EDiscordResult result = mApp.core->run_callbacks(mApp.core); // OnActivityUpdate will be asynchronously called when it's result is ready.
+    EDiscordResult result = mApp.core->run_callbacks(
+        mApp.core); // OnActivityUpdate will be asynchronously called when it's result is ready.
     if (result != EDiscordResult::DiscordResult_Ok)
     {
-        VERBOSE("DiscordController::runCallbacks(): failed to run callbacks loop, result from run_callbacks(): %d, connection marked unhealthy\n", (int)result);
+        VERBOSE("DiscordController::runCallbacks(): failed to run callbacks loop, result from run_callbacks(): %d, "
+                "connection marked unhealthy\n",
+                (int)result);
         mIsHealthy = false;
         if (result == EDiscordResult::DiscordResult_NotRunning)
-            printf("discord error runCallbacks(): the discord client is not running, connection marked unhealthy, we may attempt connection again after %d seconds.\n", reconnectAttemptDelaySeconds);
+            printf("discord error runCallbacks(): the discord client is not running, connection marked unhealthy, we "
+                   "may attempt connection again after %d seconds.\n",
+                   reconnectAttemptDelaySeconds);
     }
     VERBOSE("DiscordController::runCallbacks(): result returned: %d\n", (int)result);
 }
@@ -352,26 +371,31 @@ ActivityType DiscordController::getCurrentActivity()
 // this is done by comparing our previous RichPresnece status.
 void DiscordController::lazyUpdateRichPresence(DiscordCurrentGamePage page, GamePage *dataPage)
 {
-    // TODO: LivingLifePage should be decoupled from this controller, we may use this controller elsewhere, like gameEditor etc..
-    // this function should be in game.cpp somehow
-    VERBOSE("DiscordController::lazyUpdateRichPresence(%d, %p) was called current activity is %d\n", page, dataPage, getCurrentActivity());
+    // TODO: LivingLifePage should be decoupled from this controller, we may use this controller elsewhere, like
+    // gameEditor etc.. this function should be in game.cpp somehow
+    VERBOSE("DiscordController::lazyUpdateRichPresence(%d, %p) was called current activity is %d\n", page, dataPage,
+            getCurrentActivity());
     if (!dDisplayGame || !dDisplayStatus)
     {
 #ifdef DISCORD_DEBUGGING
         if (!dDisplayGame)
         {
-            VERBOSE("DiscordController::lazyUpdateRichPresence(%d, %p) early return because dDisplayGame is false\n", page, dataPage);
+            VERBOSE("DiscordController::lazyUpdateRichPresence(%d, %p) early return because dDisplayGame is false\n",
+                    page, dataPage);
         }
         else
         {
-            VERBOSE("DiscordController::lazyUpdateRichPresence(%d, %p) early return because dDisplayStatus is false\n", page, dataPage);
+            VERBOSE("DiscordController::lazyUpdateRichPresence(%d, %p) early return because dDisplayStatus is false\n",
+                    page, dataPage);
         }
 #endif // ENABLE_VERBOSE
         return;
     }
     if (!mApp.core || !isConnected())
     {
-        VERBOSE("DiscordController::lazyUpdateRichPresence(%d, %p) core not initialized or we are not connected, will try connecting if (now - lastReconnectAttempt > %d)\n", page, dataPage, reconnectAttemptDelaySeconds);
+        VERBOSE("DiscordController::lazyUpdateRichPresence(%d, %p) core not initialized or we are not connected, will "
+                "try connecting if (now - lastReconnectAttempt > %d)\n",
+                page, dataPage, reconnectAttemptDelaySeconds);
         return;
     }
 
@@ -386,7 +410,9 @@ void DiscordController::lazyUpdateRichPresence(DiscordCurrentGamePage page, Game
         LiveObject *ourObject = livingLifePage->getOurLiveObject();
         if (ourObject == NULL)
         {
-            VERBOSE("DiscordController::lazyUpdateRichPresence(%d, %p): early returning becauselivingLifePage->getOurLiveObject() returned null\n", page, dataPage);
+            VERBOSE("DiscordController::lazyUpdateRichPresence(%d, %p): early returning "
+                    "becauselivingLifePage->getOurLiveObject() returned null\n",
+                    page, dataPage);
             return;
         }
         char *ourName;
@@ -403,20 +429,26 @@ void DiscordController::lazyUpdateRichPresence(DiscordCurrentGamePage page, Game
             ourName = stringDuplicate("NAMELESS");
             ourNameLength = 0;
         }
-        // TODO: not necesarrly that when we have afkEmote means we are really idle!, 2hol allows you to set the afk emotion with /sleep
+        // TODO: not necesarrly that when we have afkEmote means we are really idle!, 2hol allows you to set the afk
+        // emotion with /sleep
         char isIdle = ourObject->currentEmot != NULL && getEmotion(afkEmotionIndex) == ourObject->currentEmot;
         char infertileFound, fertileFound;
         char *t1, *t2; // temp swap strings
 
         t1 = replaceOnce(ourName, "+INFERTILE+", "", &infertileFound);
         delete[] ourName;
-        if (ActivityType::LIVING_LIFE != getCurrentActivity() || dLastDisplayFirstName != dDisplayFirstName || dLastDisplayDetails != dDisplayDetails || !dFirstReportDone || dDisplayStatus != dLastDisplayStatus || ourNameLength != dLastReportedNameLength || dDisplayAge != dLastDisplayAge || (dDisplayAge && dPreviousAge != ourAge) || dLastWasInfertile != infertileFound || dLastWasIdle != isIdle)
+        if (ActivityType::LIVING_LIFE != getCurrentActivity() || dLastDisplayFirstName != dDisplayFirstName ||
+            dLastDisplayDetails != dDisplayDetails || !dFirstReportDone || dDisplayStatus != dLastDisplayStatus ||
+            ourNameLength != dLastReportedNameLength || dDisplayAge != dLastDisplayAge ||
+            (dDisplayAge && dPreviousAge != ourAge) || dLastWasInfertile != infertileFound || dLastWasIdle != isIdle)
         {
             t2 = replaceOnce(t1, "+FERTILE+", "", &fertileFound);
             delete[] t1;
             t1 = trimWhitespace(t2);
             delete[] t2;
-            ourName = stringDuplicate(strlen(t1) == 0 ? "NAMELESS" : t1); // "NAMELESS" is also used as a key after dDisplayFirstName below, if changed also change it there...
+            ourName = stringDuplicate(strlen(t1) == 0 ? "NAMELESS"
+                                                      : t1); // "NAMELESS" is also used as a key after dDisplayFirstName
+                                                             // below, if changed also change it there...
             delete[] t1;
             dLastWasInfertile = infertileFound;
             dLastWasIdle = isIdle;
@@ -475,7 +507,9 @@ void DiscordController::lazyUpdateRichPresence(DiscordCurrentGamePage page, Game
     {
         char lastActivityDisconnectedPage = ActivityType::DISCONNECTED == getCurrentActivity();
         char isIdle = lastActivityDisconnectedPage && time(0) - lastStateSetAt > idleTime;
-        if (dLastWasIdle != isIdle || !dFirstReportDone || dDisplayStatus != dLastDisplayStatus || !lastActivityDisconnectedPage) {
+        if (dLastWasIdle != isIdle || !dFirstReportDone || dDisplayStatus != dLastDisplayStatus ||
+            !lastActivityDisconnectedPage)
+        {
             if (!lastActivityDisconnectedPage)
             {
                 lastStateSetAt = time(0);
@@ -490,7 +524,8 @@ void DiscordController::lazyUpdateRichPresence(DiscordCurrentGamePage page, Game
         char lastActivityDeathPage = ActivityType::DEATH_SCREEN == getCurrentActivity();
         char isIdle = lastActivityDeathPage && time(0) - lastStateSetAt > idleTime;
 
-        if (isIdle != dLastWasIdle || dLastDisplayDetails != dDisplayDetails || !dFirstReportDone || dDisplayStatus != dLastDisplayStatus || !lastActivityDeathPage)
+        if (isIdle != dLastWasIdle || dLastDisplayDetails != dDisplayDetails || !dFirstReportDone ||
+            dDisplayStatus != dLastDisplayStatus || !lastActivityDeathPage)
         {
             if (!lastActivityDeathPage)
             {
@@ -580,12 +615,14 @@ void DiscordController::lazyUpdateRichPresence(DiscordCurrentGamePage page, Game
     }
     else if (page == DiscordCurrentGamePage::LOADING_PAGE)
     {
-        if (!dFirstReportDone || dDisplayStatus != dLastDisplayStatus || ActivityType::GAME_LOADING != getCurrentActivity())
+        if (!dFirstReportDone || dDisplayStatus != dLastDisplayStatus ||
+            ActivityType::GAME_LOADING != getCurrentActivity())
             updateActivity(ActivityType::GAME_LOADING, "Loading Game...", "");
     }
     else if (page == DiscordCurrentGamePage::WAITING_TO_BE_BORN_PAGE)
     {
-        if (!dFirstReportDone || dDisplayStatus != dLastDisplayStatus || ActivityType::WAITING_TO_BE_BORN != getCurrentActivity())
+        if (!dFirstReportDone || dDisplayStatus != dLastDisplayStatus ||
+            ActivityType::WAITING_TO_BE_BORN != getCurrentActivity())
         {
             if (userReconnect)
                 updateActivity(ActivityType::WAITING_TO_BE_BORN, "Reconnecting!...", "");
@@ -597,7 +634,8 @@ void DiscordController::lazyUpdateRichPresence(DiscordCurrentGamePage page, Game
     {
         char lastActivityMainMenu = ActivityType::IN_MAIN_MENU == getCurrentActivity();
         char isIdle = lastActivityMainMenu && time(0) - lastStateSetAt > idleTime;
-        if (dLastWasIdle != isIdle || !dFirstReportDone || dDisplayStatus != dLastDisplayStatus || !lastActivityMainMenu)
+        if (dLastWasIdle != isIdle || !dFirstReportDone || dDisplayStatus != dLastDisplayStatus ||
+            !lastActivityMainMenu)
         {
             if (!lastActivityMainMenu)
             {
@@ -611,7 +649,8 @@ void DiscordController::lazyUpdateRichPresence(DiscordCurrentGamePage page, Game
     }
     else if (page == DiscordCurrentGamePage::SETTINGS_PAGE)
     {
-        if (!dFirstReportDone || dDisplayStatus != dLastDisplayStatus || ActivityType::EDITING_SETTINGS != getCurrentActivity())
+        if (!dFirstReportDone || dDisplayStatus != dLastDisplayStatus ||
+            ActivityType::EDITING_SETTINGS != getCurrentActivity())
             updateActivity(ActivityType::EDITING_SETTINGS, "Editing Settings", "");
     }
     else if (page == DiscordCurrentGamePage::LIVING_TUTORIAL_PAGE)
@@ -628,7 +667,8 @@ void DiscordController::lazyUpdateRichPresence(DiscordCurrentGamePage page, Game
         {
             isIdle = ourObject->currentEmot != NULL && getEmotion(afkEmotionIndex) == ourObject->currentEmot;
         }
-        if (dLastWasIdle != isIdle || !dFirstReportDone || dDisplayStatus != dLastDisplayStatus || ActivityType::PLAYING_TUTORIAL != getCurrentActivity())
+        if (dLastWasIdle != isIdle || !dFirstReportDone || dDisplayStatus != dLastDisplayStatus ||
+            ActivityType::PLAYING_TUTORIAL != getCurrentActivity())
         {
             dLastWasIdle = isIdle;
             updateActivity(ActivityType::PLAYING_TUTORIAL, "Playing Tutorial", isIdle ? "[IDLE]" : "");
@@ -636,7 +676,9 @@ void DiscordController::lazyUpdateRichPresence(DiscordCurrentGamePage page, Game
     }
     else
     {
-        VERBOSE("discord error lazyUpdateRichPresence(): unhandled DiscordCurrentGamePage parameter value %d. nothing will be updated\n", page);
+        VERBOSE("discord error lazyUpdateRichPresence(): unhandled DiscordCurrentGamePage parameter value %d. nothing "
+                "will be updated\n",
+                page);
     }
 }
 void DiscordController::updateDisplayGame(char newValue)
