@@ -12,6 +12,7 @@
 #include <format>
 #include <memory>
 #include <optional>
+#include <tuple>
 
 #include "accountHmac.h"
 
@@ -861,6 +862,26 @@ static char stripFertilitySuffix(char *name)
         return false;
     }
     return false;
+}
+
+char *getFirstName(const char *name)
+{
+    if (name == NULL)
+        return NULL;
+    char *lastName = NULL;
+    SimpleVector<char *> *tokens = tokenizeString(name);
+    if (tokens->size() > 1)
+    {
+        lastName = stringDuplicate(tokens->getElementDirect(0));
+    }
+    tokens->deallocateStringElements();
+    delete tokens;
+    if (lastName != NULL && strstr(lastName, infertilitySuffix) != NULL)
+    {
+        delete[] lastName;
+        return NULL;
+    }
+    return lastName;
 }
 
 char *getLastName(const char *name)
@@ -11959,8 +11980,6 @@ void LivingLifePage::draw(doublePair inViewCenter, double inViewSize)
             delete[] debugLine;
     }
 
-    // Right Panel
-    // the same as left panel
     doublePair chatLogPanelPos = {lastScreenViewCenter.x + (recalcOffsetX(400) * gui_fov_scale_hud),
                                   lastScreenViewCenter.y + (recalcOffsetY(340) * gui_fov_scale_hud)};
     setDrawColor(1, 1, 1, 0.9);
@@ -20601,8 +20620,14 @@ void LivingLifePage::step()
                                 auto playerName = (existing->name == nullptr)
                                                       ? std::nullopt
                                                       : std::optional<std::string>(existing->name);
+                                auto filterName = [](std::string name) {
+                                    // TODO: Only return lastName if only player is not our lineage.
+                                    char *n = getFirstName(name.c_str());
+                                    return (n != nullptr) ? n : (char *)"?";
+                                };
 
-                                auto message = std::format("{}: {}", playerName.value_or("?"), existing->currentSpeech);
+                                auto message = std::format("{}: {}", (filterName(playerName.value_or("?"))),
+                                                           existing->currentSpeech);
                                 chatLogMessages->push_back(message);
 
                                 existing->speechFade = 1.0;
