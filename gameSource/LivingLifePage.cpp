@@ -11961,11 +11961,11 @@ void LivingLifePage::draw(doublePair inViewCenter, double inViewSize)
 
     // Right Panel
     // the same as left panel
-    doublePair chatLogPanelPos = {lastScreenViewCenter.x + (recalcOffsetX(400) * gui_fov_scale),
-                                  lastScreenViewCenter.y + (recalcOffsetY(340) * gui_fov_scale)};
+    doublePair chatLogPanelPos = {lastScreenViewCenter.x + (recalcOffsetX(400) * gui_fov_scale_hud),
+                                  lastScreenViewCenter.y + (recalcOffsetY(340) * gui_fov_scale_hud)};
     setDrawColor(1, 1, 1, 0.9);
     drawSprite(bigSheet, {chatLogPanelPos.x, chatLogPanelPos.y - 50}, gui_fov_scale_hud);
-    drawChatLogPanel(chatLogMessages, handwritingFont, chatLogPanelPos);
+    drawChatLogPanel(chatLogMessages, handwritingFont, chatLogPanelPos, gui_fov_scale_hud);
 
     double longestCoords = 0;
     double longestName = 0;

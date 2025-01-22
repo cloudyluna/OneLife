@@ -4,5 +4,5 @@
 #include <memory>
 #include <string>
 
-extern void drawChatLogPanel(std::unique_ptr<std::deque<std::string>> &, Font *, doublePair &);
-void drawChatLog(std::unique_ptr<std::deque<std::string>> &, Font *handwritingFont, doublePair &);
+extern void drawChatLogPanel(std::unique_ptr<std::deque<std::string>> &, Font *, doublePair &, double);
+void drawChatLog(std::unique_ptr<std::deque<std::string>> &, Font *handwritingFont, doublePair &, double);
