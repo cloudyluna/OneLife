@@ -7854,6 +7854,11 @@ void LivingLifePage::draw(doublePair inViewCenter, double inViewSize)
 
     if (stillWaitingBirth)
     {
+        // Clean up chatLogMessages on map re-join.
+        if (chatLogMessages != nullptr)
+        {
+            chatLogMessages->clear();
+        }
 
         if (getSpriteBankLoadFailure() != NULL || getSoundBankLoadFailure() != NULL)
         {
