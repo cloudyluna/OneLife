@@ -8,6 +8,7 @@
 #include "spriteBank.h"
 #include "transitionBank.h"
 #include "whiteSprites.h"
+#include <algorithm>
 #include <deque>
 #include <format>
 #include <memory>
