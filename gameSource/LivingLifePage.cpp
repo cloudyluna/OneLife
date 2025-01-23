@@ -99,7 +99,6 @@ doublePair LivingLifePage::minitechGetLastScreenViewCenter()
 static int holdingYumOrMeh = 0;
 
 static char shouldMoveCamera = true;
-
 bool showUseOnHoverEnabled = false;
 
 extern double visibleViewWidth;
@@ -337,7 +336,8 @@ static double culvertFractalRoughness = 0.62;
 static double culvertFractalAmp = 98;
 
 SimpleVector<LocationSpeech> locationSpeech;
-auto chatLogMessages = std::make_unique<std::deque<std::string>>();
+auto chatLogMessages = std::make_shared<std::deque<std::string>>();
+auto chatLogPanel = new ChatLogPanel(chatLogMessages);
 
 static void clearLocationSpeech()
 {
@@ -11984,7 +11984,10 @@ void LivingLifePage::draw(doublePair inViewCenter, double inViewSize)
                                   lastScreenViewCenter.y + (recalcOffsetY(340) * gui_fov_scale_hud)};
     setDrawColor(1, 1, 1, 0.9);
     drawSprite(bigSheet, {chatLogPanelPos.x, chatLogPanelPos.y - 50}, gui_fov_scale_hud);
-    drawChatLogPanel(chatLogMessages, handwritingFont, chatLogPanelPos, gui_fov_scale_hud);
+    chatLogPanel->setFont(handwritingFont);
+    chatLogPanel->setPosition(chatLogPanelPos);
+    chatLogPanel->setFovScale(gui_fov_scale_hud);
+    chatLogPanel->draw();
 
     double longestCoords = 0;
     double longestName = 0;
