@@ -20,7 +20,8 @@ void ChatLogPanel::draw()
 
 void ChatLogPanel::drawMessages()
 {
-    doublePair pos = {this->getPosition().x - 390, this->getPosition().y - 32 * this->getFovScale()};
+    doublePair pos = {this->getPosition().x - 390 * this->getFovScale(),
+                      this->getPosition().y - 32 * this->getFovScale()};
     double initialYOffset = pos.y;
     const size_t MAX_MESSAGES = 18;
 
