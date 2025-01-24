@@ -23,12 +23,6 @@ void ChatLogPanel::drawMessages()
     doublePair pos = {this->getPosition().x - 390 * this->getFovScale(),
                       this->getPosition().y - 32 * this->getFovScale()};
     double initialYOffset = pos.y;
-    const size_t MAX_MESSAGES = 18;
-
-    if (this->messages_->size() >= MAX_MESSAGES)
-    {
-        this->messages_->pop_front();
-    }
 
     for (auto &message : *this->messages_)
     {
@@ -41,6 +35,6 @@ void ChatLogPanel::drawMessages()
 void ChatLogPanel::drawBackground()
 {
     setDrawColor(1, 1, 1, 0.9);
-    doublePair pos = {this->getPosition().x, this->getPosition().y - 50 * this->getFovScale()};
+    doublePair pos = {this->getPosition().x, this->getPosition().y - 64 * this->getFovScale()};
     drawSprite(this->getBackgroundSprite(), pos, this->getFovScale() * 2);
 }

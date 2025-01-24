@@ -20676,6 +20676,12 @@ void LivingLifePage::step()
                                     return name;
                                 };
 
+                                const size_t MAX_MESSAGES = 18;
+                                if (chatLogMessages->size() >= MAX_MESSAGES)
+                                {
+                                    chatLogMessages->pop_front();
+                                }
+
                                 auto message = std::format("{}: {}", filterName(), existing->currentSpeech);
                                 chatLogMessages->push_back(message);
 
