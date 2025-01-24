@@ -338,7 +338,7 @@ static double culvertFractalAmp = 98;
 
 SimpleVector<LocationSpeech> locationSpeech;
 auto chatLogMessages = std::make_shared<std::deque<std::string>>();
-auto chatLogPanel = new ChatLogPanel(chatLogMessages);
+auto chatLogPanel = new ChatLogPanel(chatLogMessages, 'l'); // l stands for log
 
 static void clearLocationSpeech()
 {
@@ -865,7 +865,7 @@ static char stripFertilitySuffix(char *name)
     return false;
 }
 
-char *getFirstName(const char *name)
+char *getNamePart(const char *name, int index)
 {
     if (name == NULL)
         return NULL;
@@ -873,7 +873,7 @@ char *getFirstName(const char *name)
     SimpleVector<char *> *tokens = tokenizeString(name);
     if (tokens->size() > 1)
     {
-        lastName = stringDuplicate(tokens->getElementDirect(0));
+        lastName = stringDuplicate(tokens->getElementDirect(index));
     }
     tokens->deallocateStringElements();
     delete tokens;
@@ -885,24 +885,14 @@ char *getFirstName(const char *name)
     return lastName;
 }
 
+char *getFirstName(const char *name)
+{
+    return getNamePart(name, 0);
+}
+
 char *getLastName(const char *name)
 {
-    if (name == NULL)
-        return NULL;
-    char *lastName = NULL;
-    SimpleVector<char *> *tokens = tokenizeString(name);
-    if (tokens->size() > 1)
-    {
-        lastName = stringDuplicate(tokens->getElementDirect(1));
-    }
-    tokens->deallocateStringElements();
-    delete tokens;
-    if (lastName != NULL && strstr(lastName, infertilitySuffix) != NULL)
-    {
-        delete[] lastName;
-        return NULL;
-    }
-    return lastName;
+    return getNamePart(name, 1);
 }
 
 DisplayedFamily *LivingLifePage::getOurFamily()
@@ -11986,14 +11976,17 @@ void LivingLifePage::draw(doublePair inViewCenter, double inViewSize)
             delete[] debugLine;
     }
 
-    doublePair chatLogPanelPos = {lastScreenViewCenter.x + (recalcOffsetX(400) * gui_fov_scale_hud),
-                                  lastScreenViewCenter.y + (recalcOffsetY(340) * gui_fov_scale_hud)};
-    setDrawColor(1, 1, 1, 0.9);
-    drawSprite(bigSheet, {chatLogPanelPos.x, chatLogPanelPos.y - 50}, gui_fov_scale_hud);
-    chatLogPanel->setFont(handwritingFont);
-    chatLogPanel->setPosition(chatLogPanelPos);
-    chatLogPanel->setFovScale(gui_fov_scale_hud);
-    chatLogPanel->draw();
+    if (chatLogPanel->getIsEnabled())
+    {
+
+        doublePair chatLogPanelPos = {lastScreenViewCenter.x + (recalcOffsetX(200) * gui_fov_scale_hud),
+                                      lastScreenViewCenter.y + (recalcOffsetY(340) * gui_fov_scale_hud)};
+        chatLogPanel->setPosition(chatLogPanelPos);
+        chatLogPanel->setFovScale(gui_fov_scale_hud);
+        chatLogPanel->setFont(handwritingFont);
+        chatLogPanel->setBackgroundSprite(bigSheet);
+        chatLogPanel->draw();
+    }
 
     double longestCoords = 0;
     double longestName = 0;
@@ -26622,8 +26615,17 @@ void LivingLifePage::keyDown(unsigned char inASCII)
     if (!mSayField.isFocused() && !vogMode && minitech::livingLifeKeyDown(inASCII))
         return;
 
-    if ((coordinatesEnabled || objectSearchEnabled || familyDisplayEnabled) && !mSayField.isFocused() && !vogMode &&
-        !commandKey && !shiftKey)
+    if (shiftKey && !vogMode && !commandKey && !mSayField.isFocused())
+    {
+        bool chatLogPanelKeyPressed = isCharKey(inASCII, chatLogPanel->getToggleKey());
+        if (chatLogPanelKeyPressed)
+        {
+            chatLogPanel->setIsEnabled(!chatLogPanel->getIsEnabled());
+        }
+    }
+
+    if ((coordinatesEnabled || objectSearchEnabled || familyDisplayEnabled || chatLogPanel->getIsEnabled()) &&
+        !mSayField.isFocused() && !vogMode && !commandKey && !shiftKey)
     {
 
         char coordinatesKeyPressed = coordinatesEnabled && isCharKey(inASCII, coordinatesPanelToggleKey);
