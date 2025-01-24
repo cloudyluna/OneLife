@@ -7848,6 +7848,7 @@ void LivingLifePage::draw(doublePair inViewCenter, double inViewSize)
         // Clean up chatLogMessages on map re-join.
         if (chatLogMessages != nullptr)
         {
+            chatLogPanel->setTitle("CHAT LOG");
             chatLogMessages->clear();
         }
 
@@ -11976,23 +11977,26 @@ void LivingLifePage::draw(doublePair inViewCenter, double inViewSize)
             delete[] debugLine;
     }
 
-    if (chatLogPanel->getIsEnabled())
+    doublePair chatLogPanelPos = {lastScreenViewCenter.x + (recalcOffsetX(200) * gui_fov_scale_hud),
+                                  lastScreenViewCenter.y + (recalcOffsetY(340) * gui_fov_scale_hud)};
+    if (chatLogPanel->getIsEnabled() && getOurLiveObject() != nullptr)
     {
-
-        doublePair chatLogPanelPos = {lastScreenViewCenter.x + (recalcOffsetX(200) * gui_fov_scale_hud),
-                                      lastScreenViewCenter.y + (recalcOffsetY(340) * gui_fov_scale_hud)};
-        if (getOurLiveObject()->name != nullptr)
+        auto lastName = getLastName(getOurLiveObject()->name);
+        if (lastName != nullptr)
         {
-            auto lastName = getLastName(getOurLiveObject()->name);
             chatLogPanel->setTitle(std::format("CHAT LOG: {} FAMILY", lastName));
         }
-
-        chatLogPanel->setPosition(chatLogPanelPos);
-        chatLogPanel->setFovScale(gui_fov_scale_hud);
-        chatLogPanel->setFont(handwritingFont);
-        chatLogPanel->setBackgroundSprite(bigSheet);
-        chatLogPanel->draw();
+        else
+        {
+            chatLogPanel->setTitle("CHAT LOG");
+        }
     }
+
+    chatLogPanel->setPosition(chatLogPanelPos);
+    chatLogPanel->setFovScale(gui_fov_scale_hud);
+    chatLogPanel->setFont(handwritingFont);
+    chatLogPanel->setBackgroundSprite(bigSheet);
+    chatLogPanel->draw();
 
     double longestCoords = 0;
     double longestName = 0;
@@ -20624,41 +20628,29 @@ void LivingLifePage::step()
                             if (firstSpace != NULL)
                             {
                                 existing->currentSpeech = stringDuplicate(&(firstSpace[1]));
+
                                 auto selfPlayer = getOurLiveObject();
                                 auto makePlayerSelfName = [existing](std::string &name) {
-                                    name = "(ME)";
-                                    if (existing->name == nullptr)
-                                    {
-                                        name = "(ME) ?";
-                                    }
-                                    else
-                                    {
-                                        name = std::format("(ME) {}", getFirstName(existing->name));
-                                    }
+                                    auto _firstName = getFirstName(existing->name);
+                                    auto firstName = _firstName != nullptr ? _firstName : "?";
+                                    name = std::format("(ME) {}", firstName);
                                 };
 
                                 auto makeOtherPlayerName = [existing, selfPlayer](std::string &name) {
-                                    if (existing->name == nullptr)
+                                    auto _firstName = getFirstName(existing->name);
+                                    auto firstName = _firstName != nullptr ? _firstName : "?";
+
+                                    if (existing->lineageEveID == selfPlayer->lineageEveID)
                                     {
-                                        name = "?";
+                                        name = firstName;
                                     }
+                                    // show their family name too if the player is not part of our family
+                                    // this in case when a town map have multiple eves (in range) playing in unison.
                                     else
                                     {
-                                        if (existing->lineageEveID == selfPlayer->lineageEveID)
-                                        {
-                                            name = getFirstName(existing->name);
-                                        }
-                                        // show their family name too if the player is not part of our family
-                                        else
-                                        {
-                                            auto first = getFirstName(existing->name) != nullptr
-                                                             ? getFirstName(existing->name)
-                                                             : "?";
-                                            auto last = getLastName(existing->name) != nullptr
-                                                            ? getLastName(existing->name)
-                                                            : "?";
-                                            name = std::format("{} {}", first, last);
-                                        }
+                                        auto _lastName = getLastName(existing->name);
+                                        auto lastName = _lastName != nullptr ? _lastName : "?";
+                                        name = std::format("{} {}", firstName, lastName);
                                     }
                                 };
 

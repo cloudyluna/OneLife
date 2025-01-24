@@ -9,13 +9,16 @@
 
 void ChatLogPanel::draw()
 {
-    this->drawBackground();
+    if (this->getIsEnabled())
+    {
+        this->drawBackground();
 
-    doublePair titlePos = {this->getPosition().x, this->getPosition().y - 5 * this->getFovScale()};
-    setDrawColor(0.72, 0.18, 0.92, 1.0); // bright purple
-    this->getFont()->drawString(this->getTitle().c_str(), titlePos, alignCenter);
+        doublePair titlePos = {this->getPosition().x, this->getPosition().y - 5 * this->getFovScale()};
+        setDrawColor(0.72, 0.18, 0.92, 1.0); // bright purple
+        this->getFont()->drawString(this->getTitle().c_str(), titlePos, alignCenter);
 
-    this->drawMessages();
+        this->drawMessages();
+    }
 }
 
 void ChatLogPanel::drawMessages()
@@ -24,9 +27,9 @@ void ChatLogPanel::drawMessages()
                       this->getPosition().y - 32 * this->getFovScale()};
     double initialYOffset = pos.y;
 
+    setDrawColor(0.0, 0.0, 0.0, 1.0); // black
     for (auto &message : *this->messages_)
     {
-        setDrawColor(0.0, 0.0, 0.0, 1.0); // black
         this->getFont()->drawString(message.c_str(), {pos.x, initialYOffset}, alignLeft);
         initialYOffset -= (24.0 * this->getFovScale());
     }
