@@ -6,6 +6,8 @@
 
 class ChatLogPanel
 {
+    // defaults to "CHAT LOG"
+    std::string title_;
     Font *font_;
     doublePair position_;
     std::shared_ptr<std::deque<std::string>> messages_;
@@ -15,6 +17,14 @@ class ChatLogPanel
     SpriteHandle backgroundSprite_;
 
   public:
+    std::string getTitle()
+    {
+        return this->title_;
+    }
+    void setTitle(std::string title)
+    {
+        this->title_ = title;
+    }
     Font *getFont()
     {
         return this->font_;
@@ -62,6 +72,7 @@ class ChatLogPanel
 
     ChatLogPanel(auto messages, auto toggleKey)
     {
+        this->title_ = "CHAT LOG";
         this->messages_ = messages;
         this->toggleKey_ = toggleKey;
         this->isEnabled_ = false;

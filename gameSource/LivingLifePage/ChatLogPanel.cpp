@@ -11,17 +11,16 @@ void ChatLogPanel::draw()
 {
     this->drawBackground();
 
-    constexpr std::string titleText = "Chat Log";
     doublePair titlePos = {this->getPosition().x, this->getPosition().y - 5 * this->getFovScale()};
     setDrawColor(0.72, 0.18, 0.92, 1.0); // bright purple
-    this->getFont()->drawString(titleText.c_str(), titlePos, alignCenter);
+    this->getFont()->drawString(this->getTitle().c_str(), titlePos, alignCenter);
 
     this->drawMessages();
 }
 
 void ChatLogPanel::drawMessages()
 {
-    doublePair pos = {this->getPosition().x, this->getPosition().y - 32 * this->getFovScale()};
+    doublePair pos = {this->getPosition().x - 390, this->getPosition().y - 32 * this->getFovScale()};
     double initialYOffset = pos.y;
     const size_t MAX_MESSAGES = 18;
 
@@ -33,7 +32,7 @@ void ChatLogPanel::drawMessages()
     for (auto &message : *this->messages_)
     {
         setDrawColor(0.0, 0.0, 0.0, 1.0); // black
-        this->getFont()->drawString(message.c_str(), {pos.x, initialYOffset}, alignCenter);
+        this->getFont()->drawString(message.c_str(), {pos.x, initialYOffset}, alignLeft);
         initialYOffset -= (24.0 * this->getFovScale());
     }
 }

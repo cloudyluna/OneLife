@@ -11981,6 +11981,12 @@ void LivingLifePage::draw(doublePair inViewCenter, double inViewSize)
 
         doublePair chatLogPanelPos = {lastScreenViewCenter.x + (recalcOffsetX(200) * gui_fov_scale_hud),
                                       lastScreenViewCenter.y + (recalcOffsetY(340) * gui_fov_scale_hud)};
+        if (getOurLiveObject()->name != nullptr)
+        {
+            auto lastName = getLastName(getOurLiveObject()->name);
+            chatLogPanel->setTitle(std::format("CHAT LOG: {} FAMILY", lastName));
+        }
+
         chatLogPanel->setPosition(chatLogPanelPos);
         chatLogPanel->setFovScale(gui_fov_scale_hud);
         chatLogPanel->setFont(handwritingFont);
@@ -20618,18 +20624,59 @@ void LivingLifePage::step()
                             if (firstSpace != NULL)
                             {
                                 existing->currentSpeech = stringDuplicate(&(firstSpace[1]));
-
-                                auto playerName = (existing->name == nullptr)
-                                                      ? std::nullopt
-                                                      : std::optional<std::string>(existing->name);
-                                auto filterName = [](std::string name) {
-                                    // TODO: Only return lastName if only player is not our lineage.
-                                    char *n = getFirstName(name.c_str());
-                                    return (n != nullptr) ? n : (char *)"?";
+                                auto selfPlayer = getOurLiveObject();
+                                auto makePlayerSelfName = [existing](std::string &name) {
+                                    name = "(ME)";
+                                    if (existing->name == nullptr)
+                                    {
+                                        name = "(ME) ?";
+                                    }
+                                    else
+                                    {
+                                        name = std::format("(ME) {}", getFirstName(existing->name));
+                                    }
                                 };
 
-                                auto message = std::format("{}: {}", (filterName(playerName.value_or("?"))),
-                                                           existing->currentSpeech);
+                                auto makeOtherPlayerName = [existing, selfPlayer](std::string &name) {
+                                    if (existing->name == nullptr)
+                                    {
+                                        name = "?";
+                                    }
+                                    else
+                                    {
+                                        if (existing->lineageEveID == selfPlayer->lineageEveID)
+                                        {
+                                            name = getFirstName(existing->name);
+                                        }
+                                        // show their family name too if the player is not part of our family
+                                        else
+                                        {
+                                            auto first = getFirstName(existing->name) != nullptr
+                                                             ? getFirstName(existing->name)
+                                                             : "?";
+                                            auto last = getLastName(existing->name) != nullptr
+                                                            ? getLastName(existing->name)
+                                                            : "?";
+                                            name = std::format("{} {}", first, last);
+                                        }
+                                    }
+                                };
+
+                                auto filterName = [existing, selfPlayer, makePlayerSelfName, makeOtherPlayerName]() {
+                                    std::string name = "";
+                                    if (existing->id == selfPlayer->id)
+                                    {
+                                        makePlayerSelfName(name);
+                                    }
+                                    else
+                                    {
+                                        makeOtherPlayerName(name);
+                                    }
+
+                                    return name;
+                                };
+
+                                auto message = std::format("{}: {}", filterName(), existing->currentSpeech);
                                 chatLogMessages->push_back(message);
 
                                 existing->speechFade = 1.0;
