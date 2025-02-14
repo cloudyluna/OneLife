@@ -1639,8 +1639,6 @@ static SimpleVector<char *> curseWords;
 
 static char *curseSecret = NULL;
 
-static char *playerListSecret = NULL;
-
 void quitCleanup()
 {
     AppLog::info("Cleaning up on quit...");
@@ -12451,18 +12449,6 @@ int main()
 
     int port = SettingsManager::getIntSetting("port", 5077);
 
-    char *toTrim = SettingsManager::getStringSetting("playerListSecret", "");
-    char *trimmed = trimWhitespace(toTrim);
-    delete[] toTrim;
-    if (strlen(trimmed) > 0)
-    {
-        playerListSecret = trimmed;
-    }
-    else
-    {
-        playerListSecret = NULL;
-        delete[] trimmed;
-    }
     SocketServer *server = new SocketServer(port, 256);
 
     sockPoll.addSocketServer(server);
@@ -12572,18 +12558,6 @@ int main()
 
                 shutdownMode = 1;
                 forceShutdownMode = 1;
-            }
-            char *toTrim = SettingsManager::getStringSetting("playerListSecret", "");
-            char *trimmed = trimWhitespace(toTrim);
-            delete[] toTrim;
-            if (strlen(trimmed) > 0)
-            {
-                playerListSecret = trimmed;
-            }
-            else
-            {
-                playerListSecret = NULL;
-                delete[] trimmed;
             }
         }
 
@@ -13349,13 +13323,18 @@ int main()
 
                 if (message != NULL)
                 {
+
                     char passedSecret = false;
                     if (!nextConnection->playerListSent)
                     {
+
+                        char *playerListSecret = SettingsManager::getStringSetting("playerListSecret", "secret");
+
                         if ((playerListSecret == NULL) && 0 == strcmp(message, "PLAYER_LIST"))
                         {
                             passedSecret = true;
                         }
+
                         else if (playerListSecret != NULL)
                         {
                             char *requestWithSecret = autoSprintf("PLAYER_LIST %s", playerListSecret);
@@ -13367,10 +13346,12 @@ int main()
                             }
                             delete[] requestWithSecret;
                         }
+
+                        delete[] playerListSecret;
                     }
+
                     if (passedSecret || nextConnection->playerListSent)
                     {
-                        // request for player list https://github.com/twohoursonelife/OneLife/issues/202
                         if (!nextConnection->playerListSent)
                         {
                             HostAddress *a = nextConnection->sock->getRemoteHostAddress();
@@ -13739,8 +13720,7 @@ int main()
                 }
                 else if (nextConnection->playerListSent)
                 {
-                    int timeToClose = playerListSecret != NULL ? 10 : 4; // give more time if it is private.
-                    if (currentTime - nextConnection->connectionStartTimeSeconds > timeToClose)
+                    if (currentTime - nextConnection->connectionStartTimeSeconds > timeLimit)
                     {
                         HostAddress *a = nextConnection->sock->getRemoteHostAddress();
                         char address[100];
@@ -13754,7 +13734,7 @@ int main()
                             delete a;
                         }
                         AppLog::infoF("Closing socket of %s for PLAYER_LIST request after %d seconds", address,
-                                      timeToClose);
+                                      timeLimit);
                         deleteMembers(nextConnection);
                         newConnections.deleteElement(i);
                         i--;
