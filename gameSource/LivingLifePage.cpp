@@ -27259,14 +27259,30 @@ void LivingLifePage::keyDown(unsigned char inASCII)
 
                             if (!strcmp(typedText, translate("markCommand")))
                             {
-                                // exact match
-                                // save current coords
-                                LiveObject *ourLiveObject = getOurLiveObject();
-                                char *name =
-                                    autoSprintf("%s %d", translate("customLocation"), nextSavedCoordinatesLetter);
-                                SavedCoordinates p = {int(ourLiveObject->currentPos.x),
-                                                      int(ourLiveObject->currentPos.y), name, 0};
-                                char added = addCoordinates(p);
+                                auto p = std::make_unique<SavedCoordinates>();
+                                if (!isAnyUIHovered() && mCurMouseOverID > 0 && !mCurMouseOverSelf &&
+                                    !mCurMouseOverBehind) // cursor hovering over an object
+                                {
+                                    ObjectRecord *obj = getObject(mCurMouseOverID);
+                                    char *normalizedName = stringDuplicate(obj->description);
+                                    stripDescriptionComment(normalizedName);
+
+                                    char *name = autoSprintf("%s %d", normalizedName, nextSavedCoordinatesLetter);
+                                    *p = {static_cast<int>(mCurMouseOverWorld.x),
+                                          static_cast<int>(mCurMouseOverWorld.y), name, 0};
+                                }
+                                else
+                                {
+
+                                    // exact match
+                                    // save current coords
+                                    LiveObject *ourLiveObject = getOurLiveObject();
+                                    char *name =
+                                        autoSprintf("%s %d", translate("customLocation"), nextSavedCoordinatesLetter);
+                                    *p = {static_cast<int>(ourLiveObject->currentPos.x),
+                                          static_cast<int>(ourLiveObject->currentPos.y), name, 0};
+                                }
+                                char added = addCoordinates(*p);
                                 if (added)
                                 {
                                     nextSavedCoordinatesLetter++;
